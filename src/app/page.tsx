@@ -1,13 +1,13 @@
 "use client";
 
 import { StatusCards } from "@/components/Cards/StatusCards";
-import { RecentJobsTable } from "@/components/Tables/RecentJobsTable";
+import { RecentUsersTable } from "@/components/Tables/RecentUsersTable";
 
 const OverviewPage = () => {
   return (
     <main className="h-full space-y-6">
       <StatusCards />
-      <RecentJobsTable title="Recent Jobs" />
+      <RecentUsersTable />
     </main>
   );
 };
