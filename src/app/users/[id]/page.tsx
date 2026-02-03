@@ -1,8 +1,8 @@
 "use client";
 
 import { ClientProfileHeader } from "@/components/ClientDetails/ClientProfileHeader";
-import { ClientInfoCards } from "@/components/ClientDetails/ClientInfoCards";
-import { JobHistoryTable } from "@/components/ClientDetails/JobHistoryTable";
+import { ClientInfoCards } from "@/components/Cards/ClientInfoCards";
+import { JobHistoryTable } from "@/components/Tables/JobHistoryTable";
 import BackButton from "@/components/Shared/BackButton";
 
 // Mock data - replace with actual data fetching
