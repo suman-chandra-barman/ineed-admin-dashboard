@@ -98,7 +98,7 @@ export function RecentUsersTable() {
     // Navigate to client details page
     // Extract the numeric part from userId (e.g., "#CDI002" -> "002")
     const clientId = userId.replace("#CDI", "");
-    router.push(`/clients/${clientId}`);
+    router.push(`/users/${clientId}`);
   };
 
   // Filter users based on search
