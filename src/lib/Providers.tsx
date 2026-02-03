@@ -7,7 +7,7 @@ function Providers({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <DashboardSidebar />
       <SidebarInset className="flex flex-col h-screen overflow-hidden">
-        <Header title="Provider Dashboard" />
+        <Header title="Admin Dashboard" />
         <div className="flex-1 overflow-y-auto">{children}</div>
       </SidebarInset>
     </SidebarProvider>

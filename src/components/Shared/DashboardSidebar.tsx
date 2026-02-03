@@ -4,12 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  Users,
+  UserCheck,
   Calendar,
-  Briefcase,
-  DollarSign,
+  CreditCard,
   MessageSquare,
   Settings,
   LogOut,
+  HeartHandshake,
 } from "lucide-react";
 import {
   Sidebar,
@@ -34,12 +36,14 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { href: "/provider", label: "Overview", icon: LayoutDashboard },
-  { href: "/provider/today", label: "Today's Job", icon: Calendar },
-  { href: "/provider/jobs", label: "All Jobs", icon: Briefcase },
-  { href: "/provider/earnings", label: "Earnings", icon: DollarSign },
-  { href: "/provider/chat", label: "Chat", icon: MessageSquare },
-  { href: "/provider/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/customers", label: "Customers", icon: Users },
+  { href: "/providers", label: "Providers", icon: UserCheck },
+  { href: "/bookings", label: "Bookings", icon: Calendar },
+  { href: "/payments", label: "Payments", icon: CreditCard },
+  { href: "/services", label: "Services", icon: HeartHandshake  },
+  { href: "/messages", label: "Messages", icon: MessageSquare },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function DashboardSidebar() {
@@ -79,8 +83,8 @@ export function DashboardSidebar() {
                 const Icon = link.icon;
                 const isActive =
                   pathname === link.href ||
-                  (link.href === "/provider/settings" &&
-                    pathname.startsWith("/provider/settings"));
+                  (link.href === "/settings" &&
+                    pathname.startsWith("/settings"));
 
                 return (
                   <SidebarMenuItem key={link.href} className="h-12">
