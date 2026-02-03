@@ -3,6 +3,7 @@
 import { Search } from "lucide-react";
 import { Input } from "../ui/input";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Pagination } from "../Shared/Pagination";
 import { FiEye } from "react-icons/fi";
 
@@ -88,9 +89,17 @@ const users: User[] = [
 ];
 
 export function RecentUsersTable() {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 10;
+
+  const handleViewDetails = (userId: string) => {
+    // Navigate to client details page
+    // Extract the numeric part from userId (e.g., "#CDI002" -> "002")
+    const clientId = userId.replace("#CDI", "");
+    router.push(`/clients/${clientId}`);
+  };
 
   // Filter users based on search
   const filteredUsers = users.filter(
@@ -178,6 +187,7 @@ export function RecentUsersTable() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <button
+                    onClick={() => handleViewDetails(user.id)}
                     className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 hover:bg-gray-100 rounded-md"
                     aria-label="View user details"
                   >
@@ -217,6 +227,7 @@ export function RecentUsersTable() {
               </div>
             </div>
             <button
+              onClick={() => handleViewDetails(user.id)}
               className="flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800 p-2 w-full border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               aria-label="View user details"
             >
