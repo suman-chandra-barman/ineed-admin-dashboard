@@ -78,7 +78,7 @@ export function DashboardSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-2">
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 const isActive =
@@ -87,7 +87,7 @@ export function DashboardSidebar() {
                     pathname.startsWith("/settings"));
 
                 return (
-                  <SidebarMenuItem key={link.href} className="h-12">
+                  <SidebarMenuItem key={link.href} className="h-10">
                     <SidebarMenuButton
                       size="default"
                       asChild
