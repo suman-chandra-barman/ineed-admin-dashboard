@@ -148,7 +148,7 @@ export function BookingsTable() {
   const handleViewDetails = (bookingId: string) => {
     // Navigate to booking details page
     const clientId = bookingId.replace("#CD", "");
-    router.push(`/bookings/${clientId}`);
+    router.push(`bookings/job/${clientId}`);
   };
 
   return (

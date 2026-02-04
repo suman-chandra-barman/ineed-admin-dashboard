@@ -9,7 +9,8 @@ interface ProviderDetailsProps {
     contactNumber: string;
     address: string;
     avatar?: string;
-  };
+  } | null;
+
   onChatClick?: () => void;
 }
 
@@ -25,8 +26,8 @@ export default function ProviderDetails({
       <div className="flex justify-center mb-6">
         <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-200">
           <Image
-            src={provider.avatar || "/default-avatar.jpg"}
-            alt={provider.name}
+            src={provider ? provider.avatar || "/default-avatar.jpg" : "/default-avatar.jpg"}
+            alt={"Provider Avatar"}
             fill
             className="object-cover"
           />
@@ -38,28 +39,28 @@ export default function ProviderDetails({
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-600">Provider Name</span>
           <span className="text-sm font-medium text-gray-900">
-            {provider.name}
+            {provider ? provider.name : "---"}
           </span>
         </div>
 
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-600">Email</span>
           <span className="text-sm font-medium text-gray-900">
-            {provider.email}
+            {provider ? provider.email : "---"}
           </span>
         </div>
 
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-600">Contact Number</span>
           <span className="text-sm font-medium text-gray-900">
-            {provider.contactNumber}
+            {provider ? provider.contactNumber : "---"}
           </span>
         </div>
 
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-600">Address</span>
           <span className="text-sm font-medium text-gray-900">
-            {provider.address}
+            {provider ? provider.address : "---"}
           </span>
         </div>
       </div>
@@ -68,6 +69,7 @@ export default function ProviderDetails({
       <Button
         onClick={onChatClick}
         className="w-full"
+        disabled={!provider}
       >
         <MessageCircle className="w-5 h-5" />
         Chat
