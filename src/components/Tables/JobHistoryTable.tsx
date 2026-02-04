@@ -31,7 +31,7 @@ export const JobHistoryTable: React.FC<JobHistoryTableProps> = ({
   const currentJobs = jobs.slice(startIndex, endIndex);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+    <div className="rounded-xl border">
       <div className="p-6 border-b border-gray-100">
         <h3 className="text-lg font-bold text-gray-900">All Job History</h3>
       </div>

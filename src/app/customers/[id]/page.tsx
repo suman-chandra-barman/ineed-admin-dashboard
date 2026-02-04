@@ -81,11 +81,11 @@ export default function CustomerDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen bg-white p-4 md:p-6 rounded-2xl">
       <div className="space-y-6">
         <BackButton title=" Customer Details" />
 
-        <div className="space-y-6 bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+        <div className="space-y-6 p-6 border rounded-xl">
           <ClientProfileHeader
             name={clientData.name}
             userId={clientData.userId}
