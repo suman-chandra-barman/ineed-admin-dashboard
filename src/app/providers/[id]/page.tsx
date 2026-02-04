@@ -1,7 +1,7 @@
 "use client";
 
 import { ClientProfileHeader } from "@/components/CustomerDetails/ClientProfileHeader";
-import { JobHistoryTable } from "@/components/Tables/JobHistoryTable";
+import { ProviderJobTable } from "@/components/Tables/ProviderJobTable";
 import BackButton from "@/components/Shared/BackButton";
 import { useRouter } from "next/navigation";
 import { ProviderInfo } from "@/components/ProviderDetails/ProviderInfo";
@@ -21,54 +21,62 @@ const clientData = {
   availableTimes: "9:00 AM - 5:00 PM",
 };
 
-const jobHistoryData = [
+const providerJobsData = [
   {
     jobId: "J-9021",
-    provider: "Jhon Carter",
-    contactNumber: "+1 (555) 123-4567",
-    category: "Special Cleaning",
+    customerName: "Jhon Carter",
+    service: "Home Cleaning",
     bookingDate: "25 Jun, 2024",
-    completeDate: "25 Jun, 2024",
+    serviceDate: "25 Jun, 2024",
+    status: "Pending" as const,
   },
   {
     jobId: "J-9021",
-    provider: "Jhon Carter",
-    contactNumber: "+1 (555) 123-4567",
-    category: "Special Cleaning",
+    customerName: "Jhon Carter",
+    service: "Home Cleaning",
     bookingDate: "25 Jun, 2024",
-    completeDate: "25 Jun, 2024",
+    serviceDate: "25 Jun, 2024",
+    status: "In Progress" as const,
   },
   {
     jobId: "J-9021",
-    provider: "Jhon Carter",
-    contactNumber: "+1 (555) 123-4567",
-    category: "Special Cleaning",
+    customerName: "Jhon Carter",
+    service: "Home Cleaning",
     bookingDate: "25 Jun, 2024",
-    completeDate: "25 Jun, 2024",
+    serviceDate: "25 Jun, 2024",
+    status: "Complete" as const,
   },
   {
     jobId: "J-9021",
-    provider: "Jhon Carter",
-    contactNumber: "+1 (555) 123-4567",
-    category: "Special Cleaning",
+    customerName: "Jhon Carter",
+    service: "Home Cleaning",
     bookingDate: "25 Jun, 2024",
-    completeDate: "25 Jun, 2024",
+    serviceDate: "25 Jun, 2024",
+    status: "Pending" as const,
   },
   {
     jobId: "J-9021",
-    provider: "Jhon Carter",
-    contactNumber: "+1 (555) 123-4567",
-    category: "Special Cleaning",
+    customerName: "Jhon Carter",
+    service: "Home Cleaning",
     bookingDate: "25 Jun, 2024",
-    completeDate: "25 Jun, 2024",
+    serviceDate: "25 Jun, 2024",
+    status: "Pending" as const,
   },
   {
     jobId: "J-9021",
-    provider: "Jhon Carter",
-    contactNumber: "+1 (555) 123-4567",
-    category: "Special Cleaning",
+    customerName: "Jhon Carter",
+    service: "Home Cleaning",
     bookingDate: "25 Jun, 2024",
-    completeDate: "25 Jun, 2024",
+    serviceDate: "25 Jun, 2024",
+    status: "In Progress" as const,
+  },
+  {
+    jobId: "J-9021",
+    customerName: "Jhon Carter",
+    service: "Home Cleaning",
+    bookingDate: "25 Jun, 2024",
+    serviceDate: "25 Jun, 2024",
+    status: "In Progress" as const,
   },
 ];
 
@@ -110,8 +118,19 @@ export default function CustomerDetailsPage() {
           />
         </div>
 
-        {/* Job History Table */}
-       
+        {/* Today Job History Table */}
+        <ProviderJobTable
+          title="Today Job History"
+          jobs={providerJobsData}
+          onViewDetails={handleViewJobDetails}
+        />
+
+        {/* All Job History Table */}
+        <ProviderJobTable
+          title="All Job History"
+          jobs={providerJobsData}
+          onViewDetails={handleViewJobDetails}
+        />
       </div>
     </div>
   );
