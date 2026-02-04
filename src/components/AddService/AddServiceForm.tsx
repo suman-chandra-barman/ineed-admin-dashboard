@@ -252,21 +252,21 @@ export default function AddServiceForm() {
       </div>
 
       {/* Service Image Section */}
-      <div className="bg-white rounded-lg p-6 shadow-sm ">
+      <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">
           Service Image
         </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
           {/* Upload Area */}
           {serviceImages.length < 10 && (
-            <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors min-h-[150px]">
-              <Upload className="w-10 h-10 text-primary mb-2" />
-              <p className="text-sm text-gray-600 text-center">
+            <label className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors min-h-[120px] sm:min-h-[150px]">
+              <Upload className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-2" />
+              <p className="text-xs sm:text-sm text-gray-600 text-center">
                 Drag your file(s) or{" "}
                 <span className="text-primary">browse</span>
               </p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-[10px] sm:text-xs text-gray-400 mt-1">
                 Max 10 MB files are allowed
               </p>
               <input
@@ -283,7 +283,7 @@ export default function AddServiceForm() {
           {serviceImages.map((image, index) => (
             <div
               key={index}
-              className="relative border border-gray-200 rounded-lg overflow-hidden group min-h-[150px]"
+              className="relative border border-gray-200 rounded-lg overflow-hidden group min-h-[120px] sm:min-h-[150px] aspect-square"
             >
               <Image
                 src={image}
@@ -294,12 +294,12 @@ export default function AddServiceForm() {
               />
               <button
                 onClick={() => removeImage(index)}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
               {index > 2 && (
-                <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center text-white text-xl font-semibold">
+                <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center text-white text-lg sm:text-xl font-semibold">
                   {serviceImages.length - 3}+
                 </div>
               )}
