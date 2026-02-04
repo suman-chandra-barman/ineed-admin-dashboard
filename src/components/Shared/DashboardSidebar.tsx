@@ -41,7 +41,7 @@ const navLinks: NavLink[] = [
   { href: "/providers", label: "Providers", icon: UserCheck },
   { href: "/bookings", label: "Bookings", icon: Calendar },
   { href: "/payments", label: "Payments", icon: CreditCard },
-  { href: "/services", label: "Services", icon: HeartHandshake  },
+  { href: "/services", label: "Services", icon: HeartHandshake },
   { href: "/messages", label: "Messages", icon: MessageSquare },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -83,8 +83,7 @@ export function DashboardSidebar() {
                 const Icon = link.icon;
                 const isActive =
                   pathname === link.href ||
-                  (link.href === "/settings" &&
-                    pathname.startsWith("/settings"));
+                  (link.href !== "/" && pathname.startsWith(link.href + "/"));
 
                 return (
                   <SidebarMenuItem key={link.href} className="h-10">
