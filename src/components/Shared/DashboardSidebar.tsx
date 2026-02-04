@@ -41,7 +41,7 @@ const navLinks: NavLink[] = [
   { href: "/providers", label: "Providers", icon: UserCheck },
   { href: "/bookings", label: "Bookings", icon: Calendar },
   { href: "/payments", label: "Payments", icon: CreditCard },
-  { href: "/services", label: "Services", icon: HeartHandshake },
+  { href: "/categories", label: "Services", icon: HeartHandshake },
   { href: "/messages", label: "Messages", icon: MessageSquare },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
