@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import BackButton from "@/components/Shared/BackButton";
+import Link from "next/link";
 
 export interface Service {
   id: number;
@@ -119,9 +120,11 @@ export default function ServicesPage() {
               className="pl-10 pr-4 py-2 w-full sm:w-64 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <Button className="flex items-center gap-2">
-            <Plus /> Add Service
-          </Button>
+          <Link href="/categories/services/add-service">
+            <Button className="flex items-center gap-2">
+              <Plus /> Add Service
+            </Button>
+          </Link>
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
