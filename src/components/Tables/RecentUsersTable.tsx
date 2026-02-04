@@ -94,11 +94,14 @@ export function RecentUsersTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 10;
 
-  const handleViewDetails = (userId: string) => {
-    // Navigate to client details page
-    // Extract the numeric part from userId (e.g., "#CDI002" -> "002")
+  const handleViewDetails = (userId: string, userRole: string) => {
     const clientId = userId.replace("#CDI", "");
-    router.push(`/users/${clientId}`);
+
+    if (userRole === "Provider") {
+      router.push(`/providers/${clientId}`);
+    } else {
+      router.push(`/customers/${clientId}`);
+    }
   };
 
   // Filter users based on search
@@ -187,7 +190,7 @@ export function RecentUsersTable() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <button
-                    onClick={() => handleViewDetails(user.id)}
+                    onClick={() => handleViewDetails(user.id, user.role)}
                     className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 hover:bg-gray-100 rounded-md"
                     aria-label="View user details"
                   >
@@ -227,7 +230,7 @@ export function RecentUsersTable() {
               </div>
             </div>
             <button
-              onClick={() => handleViewDetails(user.id)}
+              onClick={() => handleViewDetails(user.id, user.role)}
               className="flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800 p-2 w-full border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               aria-label="View user details"
             >
