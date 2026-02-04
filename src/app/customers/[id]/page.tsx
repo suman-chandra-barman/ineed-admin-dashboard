@@ -4,6 +4,7 @@ import { ClientProfileHeader } from "@/components/ClientDetails/ClientProfileHea
 import { ClientInfoCards } from "@/components/Cards/ClientInfoCards";
 import { JobHistoryTable } from "@/components/Tables/JobHistoryTable";
 import BackButton from "@/components/Shared/BackButton";
+import { useRouter } from "next/navigation";
 
 // Mock data - replace with actual data fetching
 const clientData = {
@@ -68,15 +69,15 @@ const jobHistoryData = [
 ];
 
 export default function CustomerDetailsPage() {
+  const router = useRouter();
+
   const handleDeleteAccount = () => {
     // Implement delete account logic
     console.log("Delete account");
   };
 
   const handleViewJobDetails = (jobId: string) => {
-    // Navigate to job details page
-    console.log("View job details:", jobId);
-    // router.push(`/jobs/${jobId}`);
+    router.push(`job/${jobId}`);
   };
 
   return (
