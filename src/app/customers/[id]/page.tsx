@@ -1,10 +1,10 @@
 "use client";
 
-import { ClientProfileHeader } from "@/components/ClientDetails/ClientProfileHeader";
-import { ClientInfoCards } from "@/components/Cards/ClientInfoCards";
+import { ClientProfileHeader } from "@/components/CustomerDetails/ClientProfileHeader";
 import { JobHistoryTable } from "@/components/Tables/JobHistoryTable";
 import BackButton from "@/components/Shared/BackButton";
 import { useRouter } from "next/navigation";
+import { CustomerInfo } from "@/components/CustomerDetails/CustomerInfo";
 
 // Mock data - replace with actual data fetching
 const clientData = {
@@ -94,7 +94,7 @@ export default function CustomerDetailsPage() {
           />
 
           {/* Client Info Cards */}
-          <ClientInfoCards
+          <CustomerInfo
             phone={clientData.phone}
             email={clientData.email}
             address={clientData.address}
