@@ -25,7 +25,7 @@ export function Header({ title }: { title: string }) {
         </Button>
         <ProfileDropdown
           userName="Suman"
-          settingsLink="/provider/settings"
+          settingsLink="/settings"
         />
       </div>
     </header>

@@ -23,7 +23,7 @@ interface ProfileDropdownProps {
 export function ProfileDropdown({
   userName = "User",
   userAvatar,
-  settingsLink = "/user/settings",
+  settingsLink = "/settings",
   onLogout,
   showName = true,
 }: ProfileDropdownProps) {
