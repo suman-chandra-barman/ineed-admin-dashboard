@@ -96,7 +96,7 @@ export function DashboardSidebar() {
                         isActive ? "bg-primary! h-full text-white!" : "h-full"
                       }
                     >
-                      <Link href={link.href}>
+                      <Link href={link.href} className="min-w-9">
                         <Icon className="w-5! h-5!" />
                         <span>{link.label}</span>
                       </Link>
