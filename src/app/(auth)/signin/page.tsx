@@ -20,11 +20,11 @@ import logo from "@/assets/logo.svg";
 import Image from "next/image";
 import { loginformSchema } from "@/schemas/auth.schema";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useLoginMutation } from "@/redux/api/authApi";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { useAppDispatch } from "@/redux/hooks";
-import { setCredentials } from "@/redux/features/authSlice";
 import { toast } from "sonner";
 import { LoginFormValues } from "@/app/types/auth.type";
+import { setCredentials } from "@/redux/features/auth/authSlice";
 
 function SigninPage() {
   const router = useRouter();

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { forgotPasswordSchema } from "@/schemas/auth.schema";
 import { Loader2, KeyRound } from "lucide-react";
-import { useForgotPasswordMutation } from "@/redux/api/authApi";
+import { useForgotPasswordMutation } from "@/redux/features/auth/authApi";
 import { toast } from "sonner";
 import logo from "@/assets/logo.svg";
 import { ForgotPasswordFormValues } from "@/app/types/auth.type";

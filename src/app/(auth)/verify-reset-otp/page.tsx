@@ -18,16 +18,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { otpVerificationSchema } from "@/schemas/auth.schema";
-import { OtpVerificationValues } from "@/types/auth.type";
 import { Loader2, Shield } from "lucide-react";
 import {
   useVerifyResetOtpMutation,
   useForgotPasswordMutation,
-} from "@/redux/api/authApi";
+} from "@/redux/features/auth/authApi";
 import { useAppDispatch } from "@/redux/hooks";
-import { setCredentials } from "@/redux/features/authSlice";
 import { toast } from "sonner";
 import logo from "@/assets/logo.svg";
+import { OtpVerificationValues } from "@/app/types/auth.type";
+import { setCredentials } from "@/redux/features/auth/authSlice";
 
 function VerifyResetOtpContent() {
   const router = useRouter();

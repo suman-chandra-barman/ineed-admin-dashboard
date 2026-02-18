@@ -18,13 +18,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { resetPasswordSchema } from "@/schemas/auth.schema";
-import { ResetPasswordFormValues } from "@/types/auth.type";
 import { Loader2, Lock, Eye, EyeOff } from "lucide-react";
-import { useResetPasswordMutation } from "@/redux/api/authApi";
+import { useResetPasswordMutation } from "@/redux/features/auth/authApi";
 import { useAppDispatch } from "@/redux/hooks";
-import { setCredentials } from "@/redux/features/authSlice";
 import { toast } from "sonner";
 import logo from "@/assets/logo.svg";
+import { setCredentials } from "@/redux/features/auth/authSlice";
+import { ResetPasswordFormValues } from "@/app/types/auth.type";
 
 function ResetPasswordPage() {
   const router = useRouter();

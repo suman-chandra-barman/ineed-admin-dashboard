@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../store";
 import {
   saveTokenToStorage,
   saveUserToStorage,
   removeTokenFromStorage,
   removeUserFromStorage,
 } from "@/lib/auth-storage";
+import { RootState } from "@/redux/store";
 
 interface User {
   id: string;

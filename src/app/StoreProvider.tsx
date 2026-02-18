@@ -3,8 +3,8 @@
 import { makeStore } from "@/redux/store";
 import { useEffect, useRef, useState } from "react";
 import { Provider } from "react-redux";
-import { hydrate } from "@/redux/features/authSlice";
 import { getTokenFromStorage, getUserFromStorage } from "@/lib/auth-storage";
+import { hydrate } from "@/redux/features/auth/authSlice";
 
 export default function StoreProvider({
   children,

@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch } from "@/redux/hooks";
-import { logout } from "@/redux/features/authSlice";
 import { toast } from "sonner";
+import { logout } from "@/redux/features/auth/authSlice";
 
 interface LogoutModalProps {
   open: boolean;

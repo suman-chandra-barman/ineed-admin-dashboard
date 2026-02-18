@@ -1,8 +1,6 @@
 import {
   VerifyEmailRequest,
   VerifyEmailResponse,
-  ResendOtpRequest,
-  ResendOtpResponse,
   LoginRequest,
   LoginResponse,
   ForgotPasswordRequest,
@@ -12,7 +10,7 @@ import {
   ResetPasswordRequest,
   ResetPasswordResponse,
 } from "@/app/types/auth.type";
-import { baseApi } from "./baseApi";
+import { baseApi } from "../../api/baseApi";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -23,13 +21,6 @@ export const authApi = baseApi.injectEndpoints({
         body: data,
       }),
       invalidatesTags: ["User"],
-    }),
-    resendSignupOtp: builder.mutation<ResendOtpResponse, ResendOtpRequest>({
-      query: (data) => ({
-        url: "/auth/resend-signup-otp/",
-        method: "POST",
-        body: data,
-      }),
     }),
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
@@ -75,7 +66,6 @@ export const authApi = baseApi.injectEndpoints({
 
 export const {
   useVerifyEmailMutation,
-  useResendSignupOtpMutation,
   useLoginMutation,
   useForgotPasswordMutation,
   useVerifyResetOtpMutation,
