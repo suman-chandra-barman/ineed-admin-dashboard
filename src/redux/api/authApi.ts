@@ -1,7 +1,4 @@
-import { baseApi } from "./baseApi";
-import type {
-  SignupRequest,
-  SignupResponse,
+import {
   VerifyEmailRequest,
   VerifyEmailResponse,
   ResendOtpRequest,
@@ -14,17 +11,11 @@ import type {
   VerifyResetOtpResponse,
   ResetPasswordRequest,
   ResetPasswordResponse,
-} from "@/types/auth.type";
+} from "@/app/types/auth.type";
+import { baseApi } from "./baseApi";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    signup: builder.mutation<SignupResponse, SignupRequest>({
-      query: (credentials) => ({
-        url: "/auth/signup/",
-        method: "POST",
-        body: credentials,
-      }),
-    }),
     verifyEmail: builder.mutation<VerifyEmailResponse, VerifyEmailRequest>({
       query: (data) => ({
         url: "/auth/verify-email/",
@@ -83,7 +74,6 @@ export const authApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useSignupMutation,
   useVerifyEmailMutation,
   useResendSignupOtpMutation,
   useLoginMutation,

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import {Settings, LogOut, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Settings, LogOut, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
+import { useAppDispatch } from "@/redux/hooks";
+import { logout } from "@/redux/features/authSlice";
+import { toast } from "sonner";
 
 interface ProfileDropdownProps {
   userName?: string;
@@ -27,12 +31,17 @@ export function ProfileDropdown({
   onLogout,
   showName = true,
 }: ProfileDropdownProps) {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
   const handleLogout = () => {
     if (onLogout) {
       onLogout();
     } else {
       // Default logout behavior
-      console.log("Logout clicked");
+      dispatch(logout());
+      toast.success("Logged out successfully");
+      router.push("/signin");
     }
   };
 

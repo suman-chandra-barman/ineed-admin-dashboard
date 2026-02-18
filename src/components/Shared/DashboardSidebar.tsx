@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -28,6 +28,9 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import logo from "@/assets/logo.svg";
+import { useAppDispatch } from "@/redux/hooks";
+import { logout } from "@/redux/features/authSlice";
+import { toast } from "sonner";
 
 interface NavLink {
   href: string;
@@ -48,8 +51,16 @@ const navLinks: NavLink[] = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+
+  const handleLogout = () => {
+    dispatch(logout());
+    toast.success("Logged out successfully");
+    router.push("/signin");
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -114,6 +125,7 @@ export function DashboardSidebar() {
         <Button
           className="w-full flex items-center justify-center gap-2 bg-red-500 text-white hover:bg-red-600"
           size={isCollapsed ? "icon" : "default"}
+          onClick={handleLogout}
         >
           <LogOut className="w-5 h-5" />
           {!isCollapsed && <span>Log Out</span>}

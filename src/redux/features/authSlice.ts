@@ -1,5 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
+import {
+  saveTokenToStorage,
+  saveUserToStorage,
+  removeTokenFromStorage,
+  removeUserFromStorage,
+} from "@/lib/auth-storage";
 
 interface User {
   id: string;
@@ -34,16 +40,39 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.tokens.access;
       state.refreshToken = action.payload.tokens.refresh;
+
+      // Persist to localStorage and cookies
+      saveTokenToStorage(
+        action.payload.tokens.access,
+        action.payload.tokens.refresh,
+      );
+      saveUserToStorage(action.payload.user);
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.refreshToken = null;
+
+      // Clear from localStorage and cookies
+      removeTokenFromStorage();
+      removeUserFromStorage();
+    },
+    hydrate: (
+      state,
+      action: PayloadAction<{
+        user: User | null;
+        token: string | null;
+        refreshToken: string | null;
+      }>,
+    ) => {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.refreshToken = action.payload.refreshToken;
     },
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, logout, hydrate } = authSlice.actions;
 
 export default authSlice.reducer;
 
