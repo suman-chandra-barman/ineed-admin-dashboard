@@ -3,6 +3,7 @@ import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "@/lib/Providers";
 import StoreProvider from "./StoreProvider";
+import { Toaster } from "sonner";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en" className={dmSans.variable}>
       <body className="antialiased">
         <StoreProvider>{children}</StoreProvider>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

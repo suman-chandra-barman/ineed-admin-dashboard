@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
@@ -14,6 +9,7 @@ interface AddCategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (data: CategoryData) => void;
+  isLoading?: boolean;
 }
 
 export interface CategoryData {
@@ -27,6 +23,7 @@ export default function AddCategoryModal({
   open,
   onOpenChange,
   onSave,
+  isLoading = false,
 }: AddCategoryModalProps) {
   const [formData, setFormData] = useState<CategoryData>({
     icon: null,
@@ -178,18 +175,15 @@ export default function AddCategoryModal({
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-2">
-          <Button
-            variant="outline"
-            onClick={handleCancel}
-            className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
-          >
+          <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
             Cancel
           </Button>
           <Button
             onClick={handleSave}
-            disabled={!formData.categoryName || !formData.subtitle}
+            disabled={!formData.categoryName || !formData.subtitle || isLoading}
             className="flex-1"
           >
+            {isLoading ? "Creating..." : "Create"}
             Create
           </Button>
         </div>
