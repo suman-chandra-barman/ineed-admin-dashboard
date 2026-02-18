@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -28,9 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import logo from "@/assets/logo.svg";
-import { useAppDispatch } from "@/redux/hooks";
-import { logout } from "@/redux/features/authSlice";
-import { toast } from "sonner";
+import { LogoutModal } from "@/components/Modals/LogoutModal";
 
 interface NavLink {
   href: string;
@@ -51,15 +50,12 @@ const navLinks: NavLink[] = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const dispatch = useAppDispatch();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    toast.success("Logged out successfully");
-    router.push("/signin");
+  const handleLogoutClick = () => {
+    setLogoutModalOpen(true);
   };
 
   return (
@@ -125,12 +121,14 @@ export function DashboardSidebar() {
         <Button
           className="w-full flex items-center justify-center gap-2 bg-red-500 text-white hover:bg-red-600"
           size={isCollapsed ? "icon" : "default"}
-          onClick={handleLogout}
+          onClick={handleLogoutClick}
         >
           <LogOut className="w-5 h-5" />
           {!isCollapsed && <span>Log Out</span>}
         </Button>
       </SidebarFooter>
+
+      <LogoutModal open={logoutModalOpen} onOpenChange={setLogoutModalOpen} />
     </Sidebar>
   );
 }
