@@ -1,75 +1,77 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ServiceHour } from "@/app/types/service.type";
 
 interface DaySchedule {
   day: string;
   enabled: boolean;
   startTime: string;
-  startPeriod: string;
   endTime: string;
-  endPeriod: string;
 }
 
-export default function ServiceHours() {
+interface ServiceHoursProps {
+  onChange?: (hours: ServiceHour[]) => void;
+}
+
+export default function ServiceHours({ onChange }: ServiceHoursProps) {
   const [schedule, setSchedule] = useState<DaySchedule[]>([
     {
       day: "Sat",
-      enabled: true,
-      startTime: "00:00",
-      startPeriod: "am",
-      endTime: "00:00",
-      endPeriod: "am",
+      enabled: false,
+      startTime: "09:00",
+      endTime: "18:00",
     },
     {
       day: "Sun",
       enabled: false,
-      startTime: "00:00",
-      startPeriod: "am",
-      endTime: "00:00",
-      endPeriod: "pm",
+      startTime: "09:00",
+      endTime: "18:00",
     },
     {
       day: "Mon",
       enabled: false,
-      startTime: "00:00",
-      startPeriod: "am",
-      endTime: "00:00",
-      endPeriod: "pm",
+      startTime: "09:00",
+      endTime: "18:00",
     },
     {
       day: "Tue",
       enabled: false,
-      startTime: "00:00",
-      startPeriod: "am",
-      endTime: "00:00",
-      endPeriod: "pm",
+      startTime: "09:00",
+      endTime: "18:00",
     },
     {
       day: "Wed",
       enabled: false,
-      startTime: "00:00",
-      startPeriod: "am",
-      endTime: "00:00",
-      endPeriod: "pm",
+      startTime: "09:00",
+      endTime: "18:00",
     },
     {
       day: "Thu",
       enabled: false,
-      startTime: "00:00",
-      startPeriod: "am",
-      endTime: "00:00",
-      endPeriod: "pm",
+      startTime: "09:00",
+      endTime: "18:00",
     },
     {
       day: "Fri",
       enabled: false,
-      startTime: "00:00",
-      startPeriod: "am",
-      endTime: "00:00",
-      endPeriod: "pm",
+      startTime: "09:00",
+      endTime: "18:00",
     },
   ]);
+
+  // Convert schedule to API format and notify parent
+  useEffect(() => {
+    if (onChange) {
+      const serviceHours: ServiceHour[] = schedule.map((item, index) => ({
+        day_of_week: index,
+        from_time: item.startTime,
+        to_time: item.endTime,
+        is_closed: !item.enabled,
+      }));
+      onChange(serviceHours);
+    }
+  }, [schedule, onChange]);
 
   const toggleDay = (index: number) => {
     const newSchedule = [...schedule];
@@ -80,16 +82,6 @@ export default function ServiceHours() {
   const updateTime = (
     index: number,
     field: "startTime" | "endTime",
-    value: string,
-  ) => {
-    const newSchedule = [...schedule];
-    newSchedule[index][field] = value;
-    setSchedule(newSchedule);
-  };
-
-  const updatePeriod = (
-    index: number,
-    field: "startPeriod" | "endPeriod",
     value: string,
   ) => {
     const newSchedule = [...schedule];
@@ -119,48 +111,25 @@ export default function ServiceHours() {
               </span>
             </label>
 
-            {/* Start Time */}
-            <div className="flex items-center gap-1 flex-1">
+            {/* Time */}
+            <div className="flex items-center gap-4">
+              {/* start time  */}
               <input
                 type="time"
                 value={item.startTime}
                 onChange={(e) => updateTime(index, "startTime", e.target.value)}
                 disabled={!item.enabled}
-                className="px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed w-24"
+                className="px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
-              <select
-                value={item.startPeriod}
-                onChange={(e) =>
-                  updatePeriod(index, "startPeriod", e.target.value)
-                }
-                disabled={!item.enabled}
-                className="px-2 py-1.5 bg-orange-50 border border-orange-200 rounded-md text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              >
-                <option value="am">am</option>
-                <option value="pm">pm</option>
-              </select>
-            </div>
-
-            {/* End Time */}
-            <div className="flex items-center gap-1 flex-1">
+              to
+              {/* end time  */}
               <input
                 type="time"
                 value={item.endTime}
                 onChange={(e) => updateTime(index, "endTime", e.target.value)}
                 disabled={!item.enabled}
-                className="px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed w-24"
+                className="px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
-              <select
-                value={item.endPeriod}
-                onChange={(e) =>
-                  updatePeriod(index, "endPeriod", e.target.value)
-                }
-                disabled={!item.enabled}
-                className="px-2 py-1.5 bg-orange-50 border border-orange-200 rounded-md text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              >
-                <option value="am">am</option>
-                <option value="pm">pm</option>
-              </select>
             </div>
           </div>
         ))}

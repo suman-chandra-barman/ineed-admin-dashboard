@@ -108,7 +108,7 @@ export default function AddCategoryModal({
                     <input
                       id="icon-upload"
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg, image/png, image/gif image/jpg"
                       className="hidden"
                       onChange={handleIconChange}
                     />

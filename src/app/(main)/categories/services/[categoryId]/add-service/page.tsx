@@ -1,11 +1,11 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import AddServiceForm from "@/components/AddService/AddServiceForm";
 
 function AddNewServicePage() {
-  const searchParams = useSearchParams();
-  const categoryId = Number(searchParams.get("categoryId")) || 1;
+  const params = useParams();
+  const categoryId = Number(params.categoryId);
 
   return (
     <main>

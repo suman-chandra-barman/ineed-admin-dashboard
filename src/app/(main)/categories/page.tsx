@@ -123,6 +123,7 @@ function CategoriesPage() {
               {data.data.map((category) => (
                 <div key={category.id}>
                   <CategoryCard
+                    id={category.id}
                     iconUrl={category.category_icon_upload}
                     title={category.category_name}
                     description={category.subtitle}

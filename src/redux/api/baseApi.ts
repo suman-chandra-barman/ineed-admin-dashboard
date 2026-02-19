@@ -14,7 +14,7 @@ const baseQuery = fetchBaseQuery({
       const { token: storedToken } = getTokenFromStorage();
       token = storedToken;
     }
-    
+
     if (token) {
       const headerValue = token.startsWith("Bearer ")
         ? token
@@ -29,5 +29,5 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery,
   endpoints: () => ({}),
-  tagTypes: ["User", "Categories"],
+  tagTypes: ["User", "Categories", "Services", "AdditionalFeatures"],
 });

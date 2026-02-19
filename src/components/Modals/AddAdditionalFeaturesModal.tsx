@@ -19,27 +19,32 @@ interface AddAdditionalFeaturesModalProps {
     subtitle: string;
     price: number;
     estimateTime: number;
-    image?: string;
+    estimateTimeUnit: string;
+    image?: File;
   }) => void;
+  isLoading?: boolean;
 }
 
 export default function AddAdditionalFeaturesModal({
   isOpen,
   onClose,
   onAdd,
+  isLoading = false,
 }: AddAdditionalFeaturesModalProps) {
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [price, setPrice] = useState("");
   const [estimateTime, setEstimateTime] = useState("");
-  const [timeUnit, setTimeUnit] = useState("Hour");
-  const [image, setImage] = useState<string | null>(null);
+  const [timeUnit, setTimeUnit] = useState("hour");
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImage(file);
       const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl);
+      setImagePreview(imageUrl);
     }
   };
 
@@ -49,12 +54,18 @@ export default function AddAdditionalFeaturesModal({
       return;
     }
 
+    if (!image) {
+      alert("Please upload an image");
+      return;
+    }
+
     onAdd({
       title,
       subtitle,
       price: parseFloat(price),
       estimateTime: parseFloat(estimateTime),
-      image: image || undefined,
+      estimateTimeUnit: timeUnit,
+      image,
     });
 
     // Reset form
@@ -62,8 +73,9 @@ export default function AddAdditionalFeaturesModal({
     setSubtitle("");
     setPrice("");
     setEstimateTime("");
-    setTimeUnit("Hour");
+    setTimeUnit("hour");
     setImage(null);
+    setImagePreview(null);
   };
 
   const handleClose = () => {
@@ -71,8 +83,9 @@ export default function AddAdditionalFeaturesModal({
     setSubtitle("");
     setPrice("");
     setEstimateTime("");
-    setTimeUnit("Hour");
+    setTimeUnit("hour");
     setImage(null);
+    setImagePreview(null);
     onClose();
   };
 
@@ -93,10 +106,10 @@ export default function AddAdditionalFeaturesModal({
             </h3>
             <div className="flex items-center justify-between border px-4 py-1 rounded-md">
               <div className="flex items-center gap-2">
-                {image ? (
+                {imagePreview ? (
                   <div className="relative w-12 h-12 rounded-md overflow-hidden border border-gray-200">
                     <Image
-                      src={image}
+                      src={imagePreview}
                       alt="Preview"
                       className="w-full h-full object-cover"
                       width={48}
@@ -109,7 +122,6 @@ export default function AddAdditionalFeaturesModal({
                   </span>
                 )}
                 <label className="text-sm text-yellow-500 font-medium cursor-pointer hover:underline">
-                  Upload
                   <input
                     type="file"
                     accept="image/*"
@@ -118,7 +130,10 @@ export default function AddAdditionalFeaturesModal({
                   />
                 </label>
               </div>
-              <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white px-6">
+              <Button
+                size="sm"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-6"
+              >
                 <label className="cursor-pointer">
                   Upload
                   <input
@@ -197,9 +212,9 @@ export default function AddAdditionalFeaturesModal({
                 onChange={(e) => setTimeUnit(e.target.value)}
                 className="px-4 py-2 bg-orange-50 border border-orange-200 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="Hour">/Hour</option>
-                <option value="Min">/Min</option>
-                <option value="Day">/Day</option>
+                <option value="hour">Hour</option>
+                <option value="minute">Min</option>
+                <option value="day">Day</option>
               </select>
             </div>
           </div>
@@ -211,14 +226,16 @@ export default function AddAdditionalFeaturesModal({
             variant="outline"
             onClick={handleClose}
             className="flex-1 border-gray-300"
+            disabled={isLoading}
           >
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
             className="flex-1"
+            disabled={isLoading}
           >
-            Add
+            {isLoading ? "Adding..." : "Add"}
           </Button>
         </div>
       </DialogContent>
