@@ -46,6 +46,13 @@ export default function ServicesPage() {
     router.push(`/categories/services/${categoryId}/add-service`);
   };
 
+  // Normalize data.data to always be an array
+  const services = Array.isArray(data?.data)
+    ? data.data
+    : data?.data
+      ? [data.data]
+      : [];
+
   return (
     <main className="bg-white rounded-xl p-4 lg:p-6">
       {/* Header */}
@@ -88,9 +95,9 @@ export default function ServicesPage() {
       {/* Services Grid */}
       {!isLoading && !error && data && (
         <>
-          {data.data.length > 0 ? (
+          {services.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-              {data.data.map((service) => (
+              {services.map((service) => (
                 <ServiceCard
                   key={service.id}
                   service={{
@@ -112,7 +119,7 @@ export default function ServicesPage() {
           )}
 
           {/* Pagination */}
-          {data.meta.totalPage > 1 && (
+          {data.meta?.totalPage > 1 && (
             <div className="mt-8">
               <Pagination
                 currentPage={page}
