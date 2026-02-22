@@ -17,7 +17,7 @@ const ServiceCard = memo(({ service, priority = false }: ServiceCardProps) => {
     <article className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 group">
       {/* Image */}
       <div
-        className="relative h-48 sm:h-56 bg-gray-200 overflow-hidden block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className="relative h-60 sm:h-56 bg-gray-200 overflow-hidden block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         aria-label={`View ${service.title} service details`}
       >
         <Image
@@ -69,8 +69,9 @@ const ServiceCard = memo(({ service, priority = false }: ServiceCardProps) => {
           <Button variant="outline" aria-label={`Book ${service.title} now`}>
             Delete
           </Button>
-          <Button aria-label={`Book ${service.title} now`}>
-            Edit
+          <Button aria-label={`Book ${service.title} now`}>Edit</Button>
+          <Button className="col-span-2 bg-amber-400 hover:bg-amber-500">
+            Add Additional Feature
           </Button>
         </div>
       </div>

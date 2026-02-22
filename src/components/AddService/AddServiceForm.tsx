@@ -28,8 +28,8 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
   const [mainPrice, setMainPrice] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [discount, setDiscount] = useState("");
-  const [serviceImage, setServiceImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
+  const [serviceImages, setServiceImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [serviceHours, setServiceHours] = useState<ServiceHour[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [createdServiceId, setCreatedServiceId] = useState<number | null>(null);
@@ -47,20 +47,35 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
   );
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setServiceImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files);
+      const totalImages = serviceImages.length + newFiles.length;
+
+      if (totalImages > 10) {
+        toast.error("Maximum 10 images allowed");
+        return;
+      }
+
+      setServiceImages((prev) => [...prev, ...newFiles]);
+
+      // Create previews for new files
+      newFiles.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews((prev) => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
     }
+
+    // Reset input value to allow selecting the same file again
+    e.target.value = "";
   };
 
-  const removeImage = () => {
-    setServiceImage(null);
-    setImagePreview("");
+  const removeImage = (index: number) => {
+    setServiceImages((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleServiceHoursChange = useCallback((hours: ServiceHour[]) => {
@@ -132,8 +147,8 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
       toast.error("Please enter valid discount");
       return;
     }
-    if (!serviceImage) {
-      toast.error("Please upload a service image");
+    if (serviceImages.length === 0) {
+      toast.error("Please upload at least one service image");
       return;
     }
 
@@ -145,7 +160,7 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
         main_price: mainPrice,
         offer_price: offerPrice,
         discount: discount,
-        image: serviceImage,
+        image: serviceImages[0], // Send first image as main image
         service_hours: JSON.stringify(serviceHours),
       }).unwrap();
 
@@ -274,26 +289,9 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
               Service Image
             </h2>
 
-            {imagePreview ? (
-              <div className="relative border border-gray-200 rounded-lg overflow-hidden group h-48">
-                <Image
-                  src={imagePreview}
-                  alt="Service Preview"
-                  className="w-full h-full object-cover"
-                  width={400}
-                  height={300}
-                />
-                {!createdServiceId && (
-                  <button
-                    onClick={removeImage}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            ) : (
-              <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors min-h-[150px]">
+            <div className="space-y-4">
+              {/* Upload Area */}
+              <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors min-h-[120px]">
                 <Upload className="w-10 h-10 text-primary mb-2" />
                 <p className="text-sm text-gray-600 text-center">
                   Drag your file(s) or{" "}
@@ -305,12 +303,50 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
                 <input
                   type="file"
                   accept="image/*"
+                  multiple
                   className="hidden"
                   onChange={handleImageUpload}
                   disabled={!!createdServiceId}
                 />
               </label>
-            )}
+
+              {/* Image Previews */}
+              {imagePreviews.length > 0 && (
+                <div className="flex gap-3 flex-wrap">
+                  {imagePreviews.slice(0, 3).map((preview, index) => (
+                    <div
+                      key={index}
+                      className="relative w-[200px] h-[140px] border border-gray-200 rounded-lg overflow-hidden group"
+                    >
+                      <Image
+                        src={preview}
+                        alt={`Service Preview ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        width={200}
+                        height={140}
+                      />
+                      {!createdServiceId && (
+                        <button
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                          type="button"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                      {/* Show +N overlay on the third image if there are more */}
+                      {index === 2 && imagePreviews.length > 3 && (
+                        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+                          <span className="text-white text-3xl font-bold">
+                            +{imagePreviews.length - 3}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
