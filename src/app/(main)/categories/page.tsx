@@ -8,6 +8,7 @@ import { Plus, Search } from "lucide-react";
 import AddCategoryModal, {
   CategoryData,
 } from "@/components/Modals/AddCategoryModal";
+import { LoadingSpinner } from "@/components/Shared/LoadingSpinner";
 import {
   useGetCategoriesQuery,
   useCreateCategoryMutation,
@@ -102,11 +103,7 @@ function CategoriesPage() {
       </div>
 
       {/* Loading State */}
-      {isLoading && (
-        <div className="text-center py-8 animate-pulse h-[70vh] flex items-center justify-center">
-          <p className="text-gray-500">Loading categories...</p>
-        </div>
-      )}
+      {isLoading && <LoadingSpinner variant="grid" columns={4} />}
 
       {/* Error State */}
       {error && (

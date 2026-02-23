@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import BackButton from "@/components/Shared/BackButton";
 import { Pagination } from "@/components/Shared/Pagination";
 import { useGetServicesQuery } from "@/redux/features/services/serviceApi";
+import { LoadingSpinner } from "@/components/Shared/LoadingSpinner";
 
 export default function ServicesPage() {
   const params = useParams();
@@ -79,11 +80,7 @@ export default function ServicesPage() {
       </div>
 
       {/* Loading State */}
-      {isLoading && (
-        <div className="text-center py-8 animate-pulse h-[70vh] flex items-center justify-center">
-          <p className="text-gray-500">Loading services...</p>
-        </div>
-      )}
+      {isLoading && <LoadingSpinner variant="grid" columns={4} />}
 
       {/* Error State */}
       {error && (
