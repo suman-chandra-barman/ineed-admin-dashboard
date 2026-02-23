@@ -283,71 +283,7 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
             </div>
           </div>
 
-          {/* Service Image Section */}
-          <div className="bg-white rounded-lg p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Service Image
-            </h2>
-
-            <div className="space-y-4">
-              {/* Upload Area */}
-              <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors min-h-[120px]">
-                <Upload className="w-10 h-10 text-primary mb-2" />
-                <p className="text-sm text-gray-600 text-center">
-                  Drag your file(s) or{" "}
-                  <span className="text-primary">browse</span>
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Max 10 MB files are allowed
-                </p>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onChange={handleImageUpload}
-                  disabled={!!createdServiceId}
-                />
-              </label>
-
-              {/* Image Previews */}
-              {imagePreviews.length > 0 && (
-                <div className="flex gap-3 flex-wrap">
-                  {imagePreviews.slice(0, 3).map((preview, index) => (
-                    <div
-                      key={index}
-                      className="relative w-[200px] h-[140px] border border-gray-200 rounded-lg overflow-hidden group"
-                    >
-                      <Image
-                        src={preview}
-                        alt={`Service Preview ${index + 1}`}
-                        className="w-full h-full object-cover"
-                        width={200}
-                        height={140}
-                      />
-                      {!createdServiceId && (
-                        <button
-                          onClick={() => removeImage(index)}
-                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                          type="button"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                      {/* Show +N overlay on the third image if there are more */}
-                      {index === 2 && imagePreviews.length > 3 && (
-                        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                          <span className="text-white text-3xl font-bold">
-                            +{imagePreviews.length - 3}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+        
         </div>
 
         {/* Right Section - Additional Features + Service Hours */}
@@ -420,7 +356,74 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
 
           {/* Service Hours Section */}
           <ServiceHours onChange={handleServiceHoursChange} />
+
+            {/* Service Image Section */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Service Image
+            </h2>
+
+            <div className="space-y-4">
+              {/* Upload Area */}
+              <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors min-h-[120px]">
+                <Upload className="w-10 h-10 text-primary mb-2" />
+                <p className="text-sm text-gray-600 text-center">
+                  Drag your file(s) or{" "}
+                  <span className="text-primary">browse</span>
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Max 10 MB files are allowed
+                </p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  disabled={!!createdServiceId}
+                />
+              </label>
+
+              {/* Image Previews */}
+              {imagePreviews.length > 0 && (
+                <div className="flex gap-3 flex-wrap">
+                  {imagePreviews.slice(0, 3).map((preview, index) => (
+                    <div
+                      key={index}
+                      className="relative w-50 h-35 border border-gray-200 rounded-lg overflow-hidden group"
+                    >
+                      <Image
+                        src={preview}
+                        alt={`Service Preview ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        width={200}
+                        height={140}
+                      />
+                      {!createdServiceId && (
+                        <button
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                          type="button"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                      {/* Show +N overlay on the third image if there are more */}
+                      {index === 2 && imagePreviews.length > 3 && (
+                        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+                          <span className="text-white text-3xl font-bold">
+                            +{imagePreviews.length - 3}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+
       </div>
 
       {/* Action Buttons */}

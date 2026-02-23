@@ -21,7 +21,7 @@ export const serviceApi = baseApi.injectEndpoints({
           params.append("search", search);
         }
         return {
-          url: `/services/admin/services/${category_id}/?${params.toString()}`,
+          url: `/services/admin/services/?category_id=${category_id}`,
           method: "GET",
         };
       },
