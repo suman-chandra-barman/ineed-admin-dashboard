@@ -8,6 +8,11 @@ import {
   CreateAdditionalFeatureResponse,
   CreateServiceRequest,
   CreateServiceResponse,
+  DeleteServiceResponse,
+  DeleteAdditionalFeatureResponse,
+  GetFullServiceResponse,
+  UpdateServiceRequest,
+  UpdateServiceResponse,
 } from "@/app/types/service.type";
 
 export const serviceApi = baseApi.injectEndpoints({
@@ -80,15 +85,76 @@ export const serviceApi = baseApi.injectEndpoints({
         formData.append("category_id", data.category_id.toString());
         formData.append("name", data.name);
         formData.append("description", data.description);
+        formData.append("man_price", data.main_price);
+        formData.append("offer_price", data.offer_price);
+        formData.append("discount", data.discount);
+
+        // Append multiple images
+        data.images.forEach((image) => {
+          formData.append("images", image);
+        });
+
+        // Only append service_hours if not empty
+        if (data.service_hours && data.service_hours !== "[]") {
+          formData.append("service_hours", data.service_hours);
+        }
+
+        return {
+          url: "/services/admin/services/",
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Services"],
+    }),
+
+    deleteService: builder.mutation<DeleteServiceResponse, number>({
+      query: (id) => ({
+        url: `/services/admin/services/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Services"],
+    }),
+
+    deleteAdditionalFeature: builder.mutation<
+      DeleteAdditionalFeatureResponse,
+      number
+    >({
+      query: (id) => ({
+        url: `/services/admin/additional-features/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["AdditionalFeatures"],
+    }),
+
+    getFullService: builder.query<GetFullServiceResponse, number>({
+      query: (id) => ({
+        url: `/services/admin/${id}/full/`,
+        method: "GET",
+      }),
+      providesTags: ["Services", "AdditionalFeatures"],
+    }),
+
+    updateService: builder.mutation<
+      UpdateServiceResponse,
+      UpdateServiceRequest
+    >({
+      query: (data) => {
+        const formData = new FormData();
+        // formData.append("category_id", data.category_id.toString());
+        formData.append("name", data.name);
+        formData.append("description", data.description);
         formData.append("main_price", data.main_price);
         formData.append("offer_price", data.offer_price);
         formData.append("discount", data.discount);
-        formData.append("image", data.image);
+        if (data.image) {
+          formData.append("image", data.image);
+        }
         formData.append("service_hours", data.service_hours);
 
         return {
-          url: "/services/admin/create-full-service/",
-          method: "POST",
+          url: `/services/admin/${data.id}/full/`,
+          method: "PUT",
           body: formData,
         };
       },
@@ -102,4 +168,8 @@ export const {
   useGetAdditionalFeaturesQuery,
   useCreateAdditionalFeatureMutation,
   useCreateServiceMutation,
+  useDeleteServiceMutation,
+  useDeleteAdditionalFeatureMutation,
+  useGetFullServiceQuery,
+  useUpdateServiceMutation,
 } = serviceApi;

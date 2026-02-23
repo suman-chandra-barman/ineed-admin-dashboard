@@ -84,11 +84,49 @@ export interface CreateServiceRequest {
   main_price: string;
   offer_price: string;
   discount: string;
-  image: File;
+  images: File[]; // Changed from single image to multiple images
   service_hours: string; // JSON stringified array of ServiceHour
 }
 
 export interface CreateServiceResponse {
+  success: boolean;
+  message: string;
+  data: Service;
+}
+
+export interface DeleteServiceResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface DeleteAdditionalFeatureResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface GetFullServiceResponse {
+  success: boolean;
+  message: string;
+  data: {
+    service: Service;
+    service_hours: ServiceHour[];
+    additional_features: AdditionalFeature[];
+  };
+}
+
+export interface UpdateServiceRequest {
+  id: number;
+  category_id: number;
+  name: string;
+  description: string;
+  main_price: string;
+  offer_price: string;
+  discount: string;
+  image?: File;
+  service_hours: string;
+}
+
+export interface UpdateServiceResponse {
   success: boolean;
   message: string;
   data: Service;

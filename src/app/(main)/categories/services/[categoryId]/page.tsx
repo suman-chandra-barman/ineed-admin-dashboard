@@ -12,13 +12,13 @@ import { useGetServicesQuery } from "@/redux/features/services/serviceApi";
 import { LoadingSpinner } from "@/components/Shared/LoadingSpinner";
 
 export default function ServicesPage() {
-  const params = useParams();
-  const router = useRouter();
-  const categoryId = Number(params.categoryId);
-
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
+
+  const params = useParams();
+  const router = useRouter();
+  const categoryId = Number(params.categoryId);
   const limit = 10;
 
   // Fetch services
@@ -99,11 +99,11 @@ export default function ServicesPage() {
                   key={service.id}
                   service={{
                     id: service.id,
+                    category_id: service.category_id,
                     title: service.name,
                     description: service.description,
                     image: `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${service.image}`,
                     price: `From $${service.offer_price}`,
-                    rating: 4.5, // Default rating since API doesn't provide it
                     category: ["all"],
                   }}
                 />

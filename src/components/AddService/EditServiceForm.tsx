@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,74 +8,159 @@ import { Upload, X } from "lucide-react";
 import Image from "next/image";
 import ServiceHours from "@/components/AddService/ServiceHours";
 import BackButton from "@/components/Shared/BackButton";
-import { useCreateServiceMutation } from "@/redux/features/services/serviceApi";
+import AddAdditionalFeaturesModal from "../Modals/AddAdditionalFeaturesModal";
+import FeatureCard from "@/components/Cards/FeatureCard";
+import {
+  useGetFullServiceQuery,
+  useUpdateServiceMutation,
+  useCreateAdditionalFeatureMutation,
+  useDeleteAdditionalFeatureMutation,
+} from "@/redux/features/services/serviceApi";
 import { ServiceHour } from "@/app/types/service.type";
 import { toast } from "sonner";
+import { LoadingSpinner } from "../Shared/LoadingSpinner";
 
-interface AddServiceFormProps {
+interface EditServiceFormProps {
   categoryId: number;
+  serviceId: number;
 }
 
-export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
+export default function EditServiceForm({
+  categoryId,
+  serviceId,
+}: EditServiceFormProps) {
   const router = useRouter();
+
+  console.log("category id", categoryId)
+
+  // API hooks
+  const { data, isLoading, error } = useGetFullServiceQuery(serviceId);
+  const [updateService, { isLoading: isUpdating }] = useUpdateServiceMutation();
+  const [createAdditionalFeature, { isLoading: isCreatingFeature }] =
+    useCreateAdditionalFeatureMutation();
+  const [deleteAdditionalFeature] = useDeleteAdditionalFeatureMutation();
+
   const [serviceName, setServiceName] = useState("");
   const [description, setDescription] = useState("");
   const [mainPrice, setMainPrice] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [discount, setDiscount] = useState("");
-  const [serviceImages, setServiceImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [serviceImage, setServiceImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [serviceHours, setServiceHours] = useState<ServiceHour[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // API hooks
-  const [createService, { isLoading: isCreatingService }] =
-    useCreateServiceMutation();
+  // Update form when data loads - use a ref to track if initialized
+  const initializedRef = useRef(false);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (data?.data && !initializedRef.current) {
+      const service = data.data.service;
+      if (service) {
+        setServiceName(service.name || "");
+        setDescription(service.description || "");
+        setMainPrice(service.man_price || "");
+        setOfferPrice(service.offer_price || "");
+        setDiscount(service.discount || "");
+        if (service.image) {
+          setImagePreview(
+            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${service.image}`,
+          );
+        }
+      }
+      if (data.data.service_hours) {
+        setServiceHours(data.data.service_hours);
+      }
+      initializedRef.current = true;
+    }
+  }, [data]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const newFiles = Array.from(files);
-      const totalImages = serviceImages.length + newFiles.length;
+    const file = e.target.files?.[0];
+    if (file) {
+      setServiceImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
 
-      if (totalImages > 10) {
-        toast.error("Maximum 10 images allowed");
-        return;
-      }
-
-      setServiceImages((prev) => [...prev, ...newFiles]);
-
-      // Create previews for new files
-      newFiles.forEach((file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImagePreviews((prev) => [...prev, reader.result as string]);
-        };
-        reader.readAsDataURL(file);
-      });
-
-      // Clear error if images are added
-      if (errors.images) {
+      // Clear error if image is added
+      if (errors.image) {
         setErrors((prev) => {
           const newErrors = { ...prev };
-          delete newErrors.images;
+          delete newErrors.image;
           return newErrors;
         });
       }
     }
-
-    // Reset input value to allow selecting the same file again
     e.target.value = "";
   };
 
-  const removeImage = (index: number) => {
-    setServiceImages((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  const removeImage = () => {
+    setServiceImage(null);
+    setImagePreview("");
   };
 
   const handleServiceHoursChange = useCallback((hours: ServiceHour[]) => {
     setServiceHours(hours);
   }, []);
+
+  const handleAddFeature = async (feature: {
+    title: string;
+    subtitle: string;
+    price: number;
+    estimateTime: number;
+    estimateTimeUnit: string;
+    image?: File;
+  }) => {
+    if (!feature.image) {
+      toast.error("Please upload an image for the additional feature");
+      return;
+    }
+
+    try {
+      await createAdditionalFeature({
+        service_id: serviceId,
+        additional_features_title: feature.title,
+        subtitle: feature.subtitle,
+        additional_features_price: feature.price.toString(),
+        additional_features_image: feature.image,
+        estimate_time: feature.estimateTime.toString(),
+        estimate_time_unit: feature.estimateTimeUnit,
+      }).unwrap();
+
+      toast.success("Additional feature added successfully");
+      setIsModalOpen(false);
+    } catch (err) {
+      let errorMessage = "Failed to add additional feature";
+      if (err && typeof err === "object" && "data" in err) {
+        const error = err as { data?: { message?: string } };
+        if (error.data?.message) {
+          errorMessage = error.data.message;
+        }
+      }
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleDeleteFeature = async (featureId: number) => {
+    try {
+      await deleteAdditionalFeature(featureId).unwrap();
+      toast.success("Additional feature deleted successfully");
+    } catch (err) {
+      let errorMessage = "Failed to delete additional feature";
+      if (err && typeof err === "object" && "data" in err) {
+        const error = err as { data?: { message?: string } };
+        if (error.data?.message) {
+          errorMessage = error.data.message;
+        }
+      }
+      toast.error(errorMessage);
+    }
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -100,10 +185,6 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
       newErrors.discount = "Please enter valid discount";
     }
 
-    if (serviceImages.length === 0) {
-      newErrors.images = "Please upload at least one service image";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -116,21 +197,22 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
     }
 
     try {
-      const response = await createService({
+      const response = await updateService({
+        id: serviceId,
         category_id: categoryId,
         name: serviceName,
         description: description,
         main_price: mainPrice,
         offer_price: offerPrice,
         discount: discount,
-        images: serviceImages,
+        image: serviceImage || undefined,
         service_hours: JSON.stringify(serviceHours),
       }).unwrap();
 
-      toast.success(response.message || "Service created successfully");
+      toast.success(response.message || "Service updated successfully");
       router.push(`/categories/services/${categoryId}`);
     } catch (err) {
-      let errorMessage = "Failed to create service";
+      let errorMessage = "Failed to update service";
       if (err && typeof err === "object" && "data" in err) {
         const error = err as { data?: { message?: string } };
         if (error.data?.message) {
@@ -145,9 +227,25 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
     router.push(`/categories/services/${categoryId}`);
   };
 
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-xl p-4 lg:p-6">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl p-4 lg:p-6">
+        <p className="text-red-500 text-center">Failed to load service data</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl p-4 lg:p-6 space-y-6">
-      <BackButton title="Add New Service" />
+      <BackButton title="Edit Service" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Section */}
@@ -301,74 +399,93 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
               )}
             </div>
           </div>
-        </div>
 
-        {/* Right Section */}
-        <div className="space-y-6">
-          {/* Service Hours Section */}
-          <ServiceHours onChange={handleServiceHoursChange} />
-
-          {/* Service Images Section */}
+          {/* Service Image Section */}
           <div className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Service Images <span className="text-red-500">*</span>
+              Service Image
             </h2>
 
             <div className="space-y-4">
               {/* Upload Area */}
-              <label
-                className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors min-h-[120px] ${
-                  errors.images ? "border-red-500" : "border-gray-300"
-                }`}
-              >
+              <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors min-h-[120px]">
                 <Upload className="w-10 h-10 text-primary mb-2" />
                 <p className="text-sm text-gray-600 text-center">
-                  Drag your file(s) or{" "}
-                  <span className="text-primary">browse</span>
+                  Drag your file or <span className="text-primary">browse</span>
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Max 10 images, 10 MB each
+                  Max 10 MB file allowed
                 </p>
                 <input
                   type="file"
                   accept="image/*"
-                  multiple
                   className="hidden"
                   onChange={handleImageUpload}
                 />
               </label>
-              {errors.images && (
-                <p className="text-red-500 text-xs">{errors.images}</p>
-              )}
 
-              {/* Image Previews */}
-              {imagePreviews.length > 0 && (
-                <div className="flex gap-3 flex-wrap">
-                  {imagePreviews.map((preview, index) => (
-                    <div
-                      key={index}
-                      className="relative w-24 h-24 border border-gray-200 rounded-lg overflow-hidden group"
-                    >
-                      <Image
-                        src={preview}
-                        alt={`Service Preview ${index + 1}`}
-                        className="w-full h-full object-cover"
-                        width={96}
-                        height={96}
-                      />
-                      <button
-                        onClick={() => removeImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                        type="button"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="relative w-full h-48 border border-gray-200 rounded-lg overflow-hidden group">
+                  <Image
+                    src={imagePreview}
+                    alt="Service Preview"
+                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <button
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                    type="button"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
               )}
             </div>
           </div>
+        </div>
+
+        {/* Right Section */}
+        <div className="space-y-6">
+          {/* Additional Features Section */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Additional Features
+              </h2>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="text-primary text-sm font-medium hover:underline"
+              >
+                Add
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {data?.data?.additional_features &&
+              data.data.additional_features.length > 0 ? (
+                data.data.additional_features.map((feature) => (
+                  <FeatureCard
+                    key={feature.id}
+                    feature={feature}
+                    onDelete={handleDeleteFeature}
+                  />
+                ))
+              ) : (
+                <p className="text-sm text-gray-400 text-center py-4">
+                  No additional features added yet
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Service Hours Section */}
+          <ServiceHours
+            onChange={handleServiceHoursChange}
+            initialHours={serviceHours}
+          />
         </div>
       </div>
 
@@ -380,11 +497,19 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
         <Button
           className="px-8 bg-primary hover:bg-primary"
           onClick={handleSubmit}
-          disabled={isCreatingService}
+          disabled={isUpdating}
         >
-          {isCreatingService ? "Creating..." : "Add Service"}
+          {isUpdating ? "Updating..." : "Update Service"}
         </Button>
       </div>
+
+      {/* Add Additional Features Modal */}
+      <AddAdditionalFeaturesModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAdd={handleAddFeature}
+        isLoading={isCreatingFeature}
+      />
     </div>
   );
 }

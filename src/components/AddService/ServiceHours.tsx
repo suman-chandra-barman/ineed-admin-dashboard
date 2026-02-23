@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ServiceHour } from "@/app/types/service.type";
 
 interface DaySchedule {
@@ -12,9 +12,15 @@ interface DaySchedule {
 
 interface ServiceHoursProps {
   onChange?: (hours: ServiceHour[]) => void;
+  initialHours?: ServiceHour[];
 }
 
-export default function ServiceHours({ onChange }: ServiceHoursProps) {
+export default function ServiceHours({
+  onChange,
+  initialHours,
+}: ServiceHoursProps) {
+  const initializedRef = useRef(false);
+
   const [schedule, setSchedule] = useState<DaySchedule[]>([
     {
       day: "Sat",
@@ -60,9 +66,25 @@ export default function ServiceHours({ onChange }: ServiceHoursProps) {
     },
   ]);
 
+  // Initialize schedule from initialHours prop only once
+  useEffect(() => {
+    if (initialHours && initialHours.length > 0 && !initializedRef.current) {
+      const dayNames = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+      const newSchedule = initialHours.map((hour, index) => ({
+        day: dayNames[hour.day_of_week] || dayNames[index],
+        enabled: !hour.is_closed,
+        startTime: hour.from_time || "09:00",
+        endTime: hour.to_time || "18:00",
+      }));
+      setSchedule(newSchedule);
+      initializedRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialHours]);
+
   // Convert schedule to API format and notify parent
   useEffect(() => {
-    if (onChange) {
+    if (onChange && initializedRef.current) {
       const serviceHours: ServiceHour[] = schedule.map((item, index) => ({
         day_of_week: index,
         from_time: item.startTime,
