@@ -19,17 +19,17 @@ interface ServiceCardProps {
 const ServiceCard = memo(({ service, priority = false }: ServiceCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  
+
   const [deleteService, { isLoading: isDeleting }] = useDeleteServiceMutation();
   const [createAdditionalFeature, { isLoading: isCreatingFeature }] =
-  useCreateAdditionalFeatureMutation();
+    useCreateAdditionalFeatureMutation();
 
   const router = useRouter();
 
   const handleDelete = async () => {
     try {
       await deleteService(service.id).unwrap();
-      
+
       toast.success("Service deleted successfully");
       setIsDeleteDialogOpen(false);
     } catch (err) {
@@ -96,15 +96,21 @@ const ServiceCard = memo(({ service, priority = false }: ServiceCardProps) => {
           className="relative h-60 sm:h-56 bg-gray-200 overflow-hidden block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           aria-label={`View ${service.title} service details`}
         >
-          <Image
-            src={service.image}
-            alt={`${service.title} service thumbnail`}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            priority={priority}
-            loading={priority ? undefined : "lazy"}
-          />
+          {service.image ? (
+            <Image
+              src={service.image}
+              alt={`${service.title} service thumbnail`}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              priority={priority}
+              loading={priority ? undefined : "lazy"}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+              <span className="text-gray-400 text-sm">No image</span>
+            </div>
+          )}
         </div>
 
         {/* Content */}

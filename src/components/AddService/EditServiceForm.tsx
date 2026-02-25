@@ -16,7 +16,7 @@ import {
   useCreateAdditionalFeatureMutation,
   useDeleteAdditionalFeatureMutation,
 } from "@/redux/features/services/serviceApi";
-import { ServiceHour } from "@/app/types/service.type";
+import { ServiceHour, ServiceGalleryImage } from "@/app/types/service.type";
 import { toast } from "sonner";
 import { LoadingSpinner } from "../Shared/LoadingSpinner";
 
@@ -29,10 +29,6 @@ export default function EditServiceForm({
   categoryId,
   serviceId,
 }: EditServiceFormProps) {
-  const router = useRouter();
-
-  console.log("category id", categoryId)
-
   // API hooks
   const { data, isLoading, error } = useGetFullServiceQuery(serviceId);
   const [updateService, { isLoading: isUpdating }] = useUpdateServiceMutation();
@@ -45,16 +41,20 @@ export default function EditServiceForm({
   const [mainPrice, setMainPrice] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [discount, setDiscount] = useState("");
-  const [serviceImage, setServiceImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
   const [serviceHours, setServiceHours] = useState<ServiceHour[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Gallery management
+  const [galleryImages, setGalleryImages] = useState<ServiceGalleryImage[]>([]);
+  const [deleteGalleryIds, setDeleteGalleryIds] = useState<number[]>([]);
+  const [newGalleryImages, setNewGalleryImages] = useState<File[]>([]);
+  const [newGalleryPreviews, setNewGalleryPreviews] = useState<string[]>([]);
+
   // Update form when data loads - use a ref to track if initialized
   const initializedRef = useRef(false);
+  const router = useRouter();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (data?.data && !initializedRef.current) {
       const service = data.data.service;
@@ -64,44 +64,41 @@ export default function EditServiceForm({
         setMainPrice(service.man_price || "");
         setOfferPrice(service.offer_price || "");
         setDiscount(service.discount || "");
-        if (service.image) {
-          setImagePreview(
-            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${service.image}`,
-          );
-        }
       }
       if (data.data.service_hours) {
         setServiceHours(data.data.service_hours);
+      }
+      if (data.data.service?.images) {
+        setGalleryImages(data.data.service.images);
       }
       initializedRef.current = true;
     }
   }, [data]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setServiceImage(file);
+  const handleDeleteGalleryImage = (id: number) => {
+    setDeleteGalleryIds((prev) => [...prev, id]);
+    setGalleryImages((prev) => prev.filter((img) => img.id !== id));
+  };
+
+  const handleNewGalleryImagesUpload = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setNewGalleryImages((prev) => [...prev, ...files]);
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        setNewGalleryPreviews((prev) => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
-
-      // Clear error if image is added
-      if (errors.image) {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.image;
-          return newErrors;
-        });
-      }
-    }
+    });
     e.target.value = "";
   };
 
-  const removeImage = () => {
-    setServiceImage(null);
-    setImagePreview("");
+  const removeNewGalleryImage = (index: number) => {
+    setNewGalleryImages((prev) => prev.filter((_, i) => i !== index));
+    setNewGalleryPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleServiceHoursChange = useCallback((hours: ServiceHour[]) => {
@@ -205,8 +202,10 @@ export default function EditServiceForm({
         main_price: mainPrice,
         offer_price: offerPrice,
         discount: discount,
-        image: serviceImage || undefined,
         service_hours: JSON.stringify(serviceHours),
+        delete_gallery_ids:
+          deleteGalleryIds.length > 0 ? deleteGalleryIds : undefined,
+        images: newGalleryImages.length > 0 ? newGalleryImages : undefined,
       }).unwrap();
 
       toast.success(response.message || "Service updated successfully");
@@ -400,49 +399,94 @@ export default function EditServiceForm({
             </div>
           </div>
 
-          {/* Service Image Section */}
+          {/* Service Images Section */}
           <div className="bg-white rounded-lg p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Service Image
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Service Images
+              </h2>
+              <label className="text-primary text-sm font-medium hover:underline cursor-pointer">
+                Add Images
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  multiple
+                  className="hidden"
+                  onChange={handleNewGalleryImagesUpload}
+                />
+              </label>
+            </div>
 
-            <div className="space-y-4">
-              {/* Upload Area */}
-              <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors min-h-[120px]">
+            {/* Upload Area */}
+            {galleryImages.length === 0 && newGalleryPreviews.length === 0 && (
+              <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors min-h-30 mb-4">
                 <Upload className="w-10 h-10 text-primary mb-2" />
                 <p className="text-sm text-gray-600 text-center">
                   Drag your file or <span className="text-primary">browse</span>
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Max 10 MB file allowed
+                  JPG, PNG - Max 10 MB
                 </p>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png"
+                  multiple
                   className="hidden"
-                  onChange={handleImageUpload}
+                  onChange={handleNewGalleryImagesUpload}
                 />
               </label>
+            )}
 
-              {/* Image Preview */}
-              {imagePreview && (
-                <div className="relative w-full h-48 border border-gray-200 rounded-lg overflow-hidden group">
-                  <Image
-                    src={imagePreview}
-                    alt="Service Preview"
-                    className="w-full h-full object-cover"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
+            <div className="flex flex-wrap gap-3">
+              {/* Existing gallery images */}
+              {galleryImages.map((img) => (
+                <div
+                  key={img.id}
+                  className="relative w-24 h-24 border border-gray-200 rounded-lg overflow-hidden group"
+                >
+                  {img.image ? (
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${img.image}`}
+                      alt="Gallery Image"
+                      className="w-full h-full object-cover"
+                      fill
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                      <span className="text-gray-400 text-xs">No image</span>
+                    </div>
+                  )}
                   <button
-                    onClick={removeImage}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                    onClick={() => handleDeleteGalleryImage(img.id)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                     type="button"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3 h-3" />
                   </button>
                 </div>
-              )}
+              ))}
+
+              {/* New gallery image previews */}
+              {newGalleryPreviews.map((preview, index) => (
+                <div
+                  key={`new-${index}`}
+                  className="relative w-24 h-24 border border-blue-300 border-dashed rounded-lg overflow-hidden group"
+                >
+                  <Image
+                    src={preview}
+                    alt="New Gallery Image"
+                    className="w-full h-full object-cover"
+                    fill
+                  />
+                  <button
+                    onClick={() => removeNewGalleryImage(index)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                    type="button"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         </div>

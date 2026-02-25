@@ -147,10 +147,19 @@ export const serviceApi = baseApi.injectEndpoints({
         formData.append("main_price", data.main_price);
         formData.append("offer_price", data.offer_price);
         formData.append("discount", data.discount);
-        if (data.image) {
-          formData.append("image", data.image);
-        }
         formData.append("service_hours", data.service_hours);
+
+        if (data.delete_gallery_ids && data.delete_gallery_ids.length > 0) {
+          data.delete_gallery_ids.forEach((id) => {
+            formData.append("delete_gallery_ids", id.toString());
+          });
+        }
+
+        if (data.images && data.images.length > 0) {
+          data.images.forEach((img) => {
+            formData.append("images", img);
+          });
+        }
 
         return {
           url: `/services/admin/${data.id}/full/`,

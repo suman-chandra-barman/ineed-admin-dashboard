@@ -1,3 +1,9 @@
+export interface ServiceGalleryImage {
+  id: number;
+  image: string;
+  created_at: string;
+}
+
 export interface Service {
   id: number;
   category_id: number;
@@ -7,6 +13,7 @@ export interface Service {
   offer_price: string;
   discount: string;
   image: string;
+  images: ServiceGalleryImage[];
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -122,8 +129,9 @@ export interface UpdateServiceRequest {
   main_price: string;
   offer_price: string;
   discount: string;
-  image?: File;
   service_hours: string;
+  delete_gallery_ids?: number[];
+  images?: File[];
 }
 
 export interface UpdateServiceResponse {

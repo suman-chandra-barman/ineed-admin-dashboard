@@ -102,7 +102,9 @@ export default function ServicesPage() {
                     category_id: service.category_id,
                     title: service.name,
                     description: service.description,
-                    image: `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${service.image}`,
+                    image: service.image
+                      ? `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${service.image}`
+                      : null,
                     price: `From $${service.offer_price}`,
                     category: ["all"],
                   }}
