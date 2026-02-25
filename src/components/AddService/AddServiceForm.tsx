@@ -331,7 +331,7 @@ export default function AddServiceForm({ categoryId }: AddServiceFormProps) {
                 </p>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png"
                   multiple
                   className="hidden"
                   onChange={handleImageUpload}

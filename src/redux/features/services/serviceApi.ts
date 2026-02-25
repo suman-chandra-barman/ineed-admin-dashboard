@@ -85,7 +85,7 @@ export const serviceApi = baseApi.injectEndpoints({
         formData.append("category_id", data.category_id.toString());
         formData.append("name", data.name);
         formData.append("description", data.description);
-        formData.append("man_price", data.main_price);
+        formData.append("main_price", data.main_price);
         formData.append("offer_price", data.offer_price);
         formData.append("discount", data.discount);
 
