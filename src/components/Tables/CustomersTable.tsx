@@ -6,88 +6,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pagination } from "../Shared/Pagination";
 import { FiEye } from "react-icons/fi";
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  totalBooking: number;
-  status: "Active" | "Inactive";
-}
-
-// Sample data - replace with actual API data
-const customers: Customer[] = [
-  {
-    id: "#CDI002",
-    name: "Zara Khan",
-    email: "name@gmail.com",
-    totalBooking: 55,
-    status: "Active",
-  },
-  {
-    id: "#CDI002",
-    name: "Zara Khan",
-    email: "name@gmail.com",
-    totalBooking: 55,
-    status: "Inactive",
-  },
-  {
-    id: "#CDI002",
-    name: "Zara Khan",
-    email: "name@gmail.com",
-    totalBooking: 55,
-    status: "Active",
-  },
-  {
-    id: "#CDI002",
-    name: "Zara Khan",
-    email: "name@gmail.com",
-    totalBooking: 55,
-    status: "Inactive",
-  },
-  {
-    id: "#CDI002",
-    name: "Zara Khan",
-    email: "name@gmail.com",
-    totalBooking: 55,
-    status: "Active",
-  },
-  {
-    id: "#CDI002",
-    name: "Zara Khan",
-    email: "name@gmail.com",
-    totalBooking: 55,
-    status: "Inactive",
-  },
-  {
-    id: "#CDI002",
-    name: "Zara Khan",
-    email: "name@gmail.com",
-    totalBooking: 55,
-    status: "Active",
-  },
-  {
-    id: "#CDI002",
-    name: "Zara Khan",
-    email: "name@gmail.com",
-    totalBooking: 55,
-    status: "Inactive",
-  },
-  {
-    id: "#CDI002",
-    name: "Zara Khan",
-    email: "name@gmail.com",
-    totalBooking: 55,
-    status: "Active",
-  },
-  {
-    id: "#CDI002",
-    name: "Zara Khan",
-    email: "name@gmail.com",
-    totalBooking: 55,
-    status: "Inactive",
-  },
-];
+import { useGetCustomersQuery } from "@/redux/features/customers/customerApi";
+import { LoadingSpinner } from "../Shared/LoadingSpinner";
 
 const getStatusStyle = (status: string) => {
   switch (status) {
@@ -106,26 +26,19 @@ export function CustomersTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 10;
 
+  const { data, isLoading, isError } = useGetCustomersQuery({
+    page: currentPage,
+    page_size: itemsPerPage,
+    search: searchQuery,
+  });
+
+  const customers = data?.data?.results ?? [];
+  const totalPages = data?.data?.total_pages ?? 1;
+
   const handleViewDetails = (customerId: string) => {
-    // Navigate to customer details page
-    const clientId = customerId.replace("#CDI", "");
-    router.push(`/customers/${clientId}`);
+    const cleanId = customerId.replace(/^#/, "");
+    router.push(`/customers/${cleanId}`);
   };
-
-  // Filter customers based on search
-  const filteredCustomers = customers.filter(
-    (customer) =>
-      customer.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.status.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentCustomers = filteredCustomers.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -153,116 +66,136 @@ export function CustomersTable() {
         </div>
       </div>
 
+      {/* Loading / Error states */}
+      {isLoading && (
+        <div className="flex justify-center items-center py-16">
+          <LoadingSpinner />
+        </div>
+      )}
+      {isError && (
+        <div className="p-8 text-center text-red-500">
+          Failed to load customers. Please try again.
+        </div>
+      )}
+
       {/* Table - Desktop */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-100">
-            <tr>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                User ID
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                User Name
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Email
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Total Booking
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {currentCustomers.map((customer, index) => (
-              <tr key={index} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {customer.id}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {customer.name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {customer.email}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {customer.totalBooking}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getStatusStyle(
-                      customer.status,
-                    )}`}
-                  >
-                    {customer.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <button
-                    onClick={() => handleViewDetails(customer.id)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 hover:bg-gray-100 rounded-md"
-                    aria-label="View customer details"
-                  >
-                    <FiEye className="w-5 h-5" />
-                  </button>
-                </td>
+      {!isLoading && !isError && (
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-100">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  User ID
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  User Name
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Total Booking
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Action
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {customers.map((customer, index) => (
+                <tr key={index} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {customer.user_id}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {customer.user_name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {customer.email}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {customer.total_booking}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getStatusStyle(
+                        customer.status,
+                      )}`}
+                    >
+                      {customer.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <button
+                      onClick={() => handleViewDetails(customer.user_id)}
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 hover:bg-gray-100 rounded-md"
+                      aria-label="View customer details"
+                    >
+                      <FiEye className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Cards - Mobile */}
-      <div className="md:hidden divide-y divide-gray-100">
-        {currentCustomers.map((customer, index) => (
-          <div key={index} className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-900">
-                {customer.id}
-              </span>
-              <span
-                className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getStatusStyle(
-                  customer.status,
-                )}`}
-              >
-                {customer.status}
-              </span>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-xs text-gray-500">Name:</span>
-                <span className="text-sm text-gray-900">{customer.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-xs text-gray-500">Email:</span>
-                <span className="text-sm text-gray-900">{customer.email}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-xs text-gray-500">Total Booking:</span>
-                <span className="text-sm text-gray-900">
-                  {customer.totalBooking}
+      {!isLoading && !isError && (
+        <div className="md:hidden divide-y divide-gray-100">
+          {customers.map((customer, index) => (
+            <div key={index} className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-gray-900">
+                  {customer.user_id}
+                </span>
+                <span
+                  className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getStatusStyle(
+                    customer.status,
+                  )}`}
+                >
+                  {customer.status}
                 </span>
               </div>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-500">Name:</span>
+                  <span className="text-sm text-gray-900">
+                    {customer.user_name}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-500">Email:</span>
+                  <span className="text-sm text-gray-900">
+                    {customer.email}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-500">Total Booking:</span>
+                  <span className="text-sm text-gray-900">
+                    {customer.total_booking}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => handleViewDetails(customer.user_id)}
+                className="flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800 p-2 w-full border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                aria-label="View customer details"
+              >
+                <FiEye className="w-4 h-4" />
+                <span className="text-sm">View Details</span>
+              </button>
             </div>
-            <button
-              onClick={() => handleViewDetails(customer.id)}
-              className="flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800 p-2 w-full border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-              aria-label="View customer details"
-            >
-              <FiEye className="w-4 h-4" />
-              <span className="text-sm">View Details</span>
-            </button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Pagination */}
-      {filteredCustomers.length > 0 && (
+      {!isLoading && !isError && customers.length > 0 && (
         <div className="border-t border-gray-100">
           <Pagination
             currentPage={currentPage}
@@ -273,7 +206,7 @@ export function CustomersTable() {
       )}
 
       {/* No Results */}
-      {filteredCustomers.length === 0 && (
+      {!isLoading && !isError && customers.length === 0 && (
         <div className="p-8 text-center text-gray-500">
           No customers found matching your search.
         </div>
