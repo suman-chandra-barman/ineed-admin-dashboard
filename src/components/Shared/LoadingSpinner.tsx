@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 interface LoadingSpinnerProps {
   className?: string;
@@ -53,13 +54,9 @@ export function LoadingSpinner({
   // Default variant - centered spinner
   return (
     <div className={cn("flex h-[70vh] items-center justify-center", className)}>
-      <div className="flex flex-col items-center gap-4">
-        <div className="flex gap-2">
-          <Skeleton className="h-3 w-3 rounded-full animate-bounce [animation-delay:-0.3s]" />
-          <Skeleton className="h-3 w-3 rounded-full animate-bounce [animation-delay:-0.15s]" />
-          <Skeleton className="h-3 w-3 rounded-full animate-bounce" />
-        </div>
-        <p className="text-sm text-muted-foreground">{text}</p>
+      <div className="flex flex-col items-center gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        {<p className="text-gray-600 text-sm">{text}</p>}
       </div>
     </div>
   );

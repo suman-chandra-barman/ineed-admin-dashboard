@@ -31,9 +31,7 @@ export default function CustomerDetailsPage({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white p-4 md:p-6 rounded-2xl flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
+        <LoadingSpinner text="Loading customer details..." />
     );
   }
 

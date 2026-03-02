@@ -20,7 +20,7 @@ const OverviewPage = () => {
   if (isLoading) {
     return (
       <main className="h-full flex items-center justify-center">
-        <LoadingSpinner />
+        <LoadingSpinner text="Loading dashboard data..." />
       </main>
     );
   }

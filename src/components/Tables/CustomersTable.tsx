@@ -68,8 +68,8 @@ export function CustomersTable() {
 
       {/* Loading / Error states */}
       {isLoading && (
-        <div className="flex justify-center items-center py-16">
-          <LoadingSpinner />
+        <div className="flex justify-center items-center">
+          <LoadingSpinner text="Loading customers..." />
         </div>
       )}
       {isError && (
