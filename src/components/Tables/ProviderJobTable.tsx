@@ -10,7 +10,13 @@ interface ProviderJob {
   service: string;
   bookingDate: string;
   serviceDate: string;
-  status: "Pending" | "In Progress" | "Complete" | "Assigned" | "Requested";
+  status:
+    | "Pending"
+    | "In Progress"
+    | "Complete"
+    | "Assigned"
+    | "Requested"
+    | "Cancelled";
 }
 
 interface ProviderJobTableProps {
@@ -32,6 +38,8 @@ const getStatusStyles = (status: ProviderJob["status"]) => {
       return "bg-purple-100 text-purple-700";
     case "Requested":
       return "bg-orange-100 text-orange-700";
+    case "Cancelled":
+      return "bg-rose-100 text-rose-700";
     default:
       return "bg-gray-100 text-gray-700";
   }

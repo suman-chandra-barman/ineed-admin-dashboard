@@ -36,5 +36,6 @@ export const baseApi = createApi({
     "AdditionalFeatures",
     "Overview",
     "Customers",
+    "Providers",
   ],
 });
