@@ -2,125 +2,66 @@
 
 import { Search } from "lucide-react";
 import { Input } from "../ui/input";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Pagination } from "../Shared/Pagination";
 import { FiEye } from "react-icons/fi";
+import { RecentUser } from "@/app/types/overview.type";
 
-interface User {
-  id: string;
-  role: "Customer" | "Provider";
-  email: string;
-  contactNumber: string;
-  joinDate: string;
+interface RecentUsersTableProps {
+  users: RecentUser[];
+  totalPages: number;
+  currentPage: number;
+  onSearch: (query: string) => void;
+  onPageChange: (page: number) => void;
 }
 
-const users: User[] = [
-  {
-    id: "#CDI002",
-    role: "Customer",
-    email: "name@gmail.com",
-    contactNumber: "+1 265 0231",
-    joinDate: "Dec 10, 2024 - 10:30 am",
-  },
-  {
-    id: "#CDI002",
-    role: "Provider",
-    email: "name@gmail.com",
-    contactNumber: "+1 265 0231",
-    joinDate: "Dec 10, 2024 - 10:30 am",
-  },
-  {
-    id: "#CDI002",
-    role: "Customer",
-    email: "name@gmail.com",
-    contactNumber: "+1 265 0231",
-    joinDate: "Dec 10, 2024 - 10:30 am",
-  },
-  {
-    id: "#CDI002",
-    role: "Provider",
-    email: "name@gmail.com",
-    contactNumber: "+1 265 0231",
-    joinDate: "Dec 10, 2024 - 10:30 am",
-  },
-  {
-    id: "#CDI002",
-    role: "Customer",
-    email: "name@gmail.com",
-    contactNumber: "+1 265 0231",
-    joinDate: "Dec 10, 2024 - 10:30 am",
-  },
-  {
-    id: "#CDI002",
-    role: "Provider",
-    email: "name@gmail.com",
-    contactNumber: "+1 265 0231",
-    joinDate: "Dec 10, 2024 - 10:30 am",
-  },
-  {
-    id: "#CDI002",
-    role: "Customer",
-    email: "name@gmail.com",
-    contactNumber: "+1 265 0231",
-    joinDate: "Dec 10, 2024 - 10:30 am",
-  },
-  {
-    id: "#CDI002",
-    role: "Provider",
-    email: "name@gmail.com",
-    contactNumber: "+1 265 0231",
-    joinDate: "Dec 10, 2024 - 10:30 am",
-  },
-  {
-    id: "#CDI002",
-    role: "Customer",
-    email: "name@gmail.com",
-    contactNumber: "+1 265 0231",
-    joinDate: "Dec 10, 2024 - 10:30 am",
-  },
-  {
-    id: "#CDI002",
-    role: "Provider",
-    email: "name@gmail.com",
-    contactNumber: "+1 265 0231",
-    joinDate: "Dec 10, 2024 - 10:30 am",
-  },
-];
-
-export function RecentUsersTable() {
+export function RecentUsersTable({
+  users,
+  totalPages,
+  currentPage,
+  onSearch,
+  onPageChange,
+}: RecentUsersTableProps) {
   const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
-  const itemsPerPage = 10;
+  const [searchInput, setSearchInput] = useState("");
 
-  const handleViewDetails = (userId: string, userRole: string) => {
-    const clientId = userId.replace("#CDI", "");
+  // Debounce search
+  const debounce = useCallback((fn: (val: string) => void, delay: number) => {
+    let timer: ReturnType<typeof setTimeout>;
+    return (val: string) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(val), delay);
+    };
+  }, []);
 
-    if (userRole === "Provider") {
-      router.push(`/providers/${clientId}`);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(debounce(onSearch, 400), [onSearch]);
+
+  useEffect(() => {
+    debouncedSearch(searchInput);
+  }, [searchInput, debouncedSearch]);
+
+  const handleViewDetails = (user: RecentUser) => {
+    // Strip leading '#' from normal_id => e.g. "USR886f5809"
+    const cleanId = user.normal_id.replace(/^#/, "");
+    if (user.role === "provider") {
+      router.push(`/providers/${cleanId}`);
     } else {
-      router.push(`/customers/${clientId}`);
+      router.push(`/customers/${cleanId}`);
     }
   };
 
-  // Filter users based on search
-  const filteredUsers = users.filter(
-    (user) =>
-      user.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.contactNumber.includes(searchQuery),
-  );
-
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentUsers = filteredUsers.slice(startIndex, endIndex);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch {
+      return dateStr;
+    }
   };
 
   return (
@@ -134,10 +75,9 @@ export function RecentUsersTable() {
             <Input
               type="text"
               placeholder="Search"
-              value={searchQuery}
+              value={searchInput}
               onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1); // Reset to first page on search
+                setSearchInput(e.target.value);
               }}
               className="pl-10 pr-4 py-2 w-full sm:w-64 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
@@ -152,6 +92,9 @@ export function RecentUsersTable() {
             <tr>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 User ID
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Name
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Role
@@ -171,26 +114,29 @@ export function RecentUsersTable() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {currentUsers.map((user, index) => (
-              <tr key={index} className="hover:bg-gray-50 transition-colors">
+            {users.map((user) => (
+              <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {user.id}
+                  {user.normal_id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {user.full_name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize">
                   {user.role}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {user.email}
+                  {user.email_address}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {user.contactNumber}
+                  {user.contact_number ?? "—"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {user.joinDate}
+                  {formatDate(user.join_date)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <button
-                    onClick={() => handleViewDetails(user.id, user.role)}
+                    onClick={() => handleViewDetails(user)}
                     className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 hover:bg-gray-100 rounded-md"
                     aria-label="View user details"
                   >
@@ -205,32 +151,42 @@ export function RecentUsersTable() {
 
       {/* Cards - Mobile */}
       <div className="md:hidden divide-y divide-gray-100">
-        {currentUsers.map((user, index) => (
-          <div key={index} className="p-4 space-y-3">
+        {users.map((user) => (
+          <div key={user.id} className="p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-900">
-                {user.id}
+                {user.normal_id}
               </span>
-              <span className="text-sm text-gray-600">{user.role}</span>
+              <span className="text-sm text-gray-600 capitalize">
+                {user.role}
+              </span>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between">
+                <span className="text-xs text-gray-500">Name:</span>
+                <span className="text-sm text-gray-900">{user.full_name}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-xs text-gray-500">Email:</span>
-                <span className="text-sm text-gray-900">{user.email}</span>
+                <span className="text-sm text-gray-900">
+                  {user.email_address}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-xs text-gray-500">Contact:</span>
                 <span className="text-sm text-gray-900">
-                  {user.contactNumber}
+                  {user.contact_number ?? "—"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-xs text-gray-500">Join Date:</span>
-                <span className="text-sm text-gray-900">{user.joinDate}</span>
+                <span className="text-sm text-gray-900">
+                  {formatDate(user.join_date)}
+                </span>
               </div>
             </div>
             <button
-              onClick={() => handleViewDetails(user.id, user.role)}
+              onClick={() => handleViewDetails(user)}
               className="flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800 p-2 w-full border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               aria-label="View user details"
             >
@@ -242,18 +198,18 @@ export function RecentUsersTable() {
       </div>
 
       {/* Pagination */}
-      {filteredUsers.length > 0 && (
+      {users.length > 0 && (
         <div className="border-t border-gray-100">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={handlePageChange}
+            onPageChange={onPageChange}
           />
         </div>
       )}
 
       {/* No Results */}
-      {filteredUsers.length === 0 && (
+      {users.length === 0 && (
         <div className="p-8 text-center text-gray-500">
           No users found matching your search.
         </div>

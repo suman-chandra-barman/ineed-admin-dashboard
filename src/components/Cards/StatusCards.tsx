@@ -2,9 +2,10 @@
 
 import React from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import {FaCalendarCheck, FaUsers } from "react-icons/fa";
+import { FaCalendarCheck, FaUsers } from "react-icons/fa";
 import { LiaUsersCogSolid } from "react-icons/lia";
 import { LuBadgeCheck } from "react-icons/lu";
+import { OverviewCards } from "@/app/types/overview.type";
 
 interface StatCardProps {
   title: string;
@@ -57,48 +58,52 @@ const StatCard: React.FC<StatCardProps> = ({
   );
 };
 
-export function StatusCards() {
+interface StatusCardsProps {
+  data?: OverviewCards;
+}
+
+export function StatusCards({ data }: StatusCardsProps) {
   const stats = [
     {
       title: "Total Users",
-      value: "10293",
+      value: data?.total_users.value ?? "—",
       trend: {
-        value: "13%",
-        isPositive: true,
-        label: "Up from past week",
+        value: `${Math.abs(data?.total_users.trend.percent ?? 0)}%`,
+        isPositive: (data?.total_users.trend.direction ?? "up") === "up",
+        label: data?.total_users.trend.text ?? "Up from past week",
       },
-      icon: <FaUsers  className="w-7 h-7 text-blue-600" />,
+      icon: <FaUsers className="w-7 h-7 text-blue-600" />,
       iconBgColor: "bg-blue-100",
     },
     {
       title: "Total Providers",
-      value: "10293",
+      value: data?.total_providers.value ?? "—",
       trend: {
-        value: "4.3%",
-        isPositive: false,
-        label: "Down from yesterday",
+        value: `${Math.abs(data?.total_providers.trend.percent ?? 0)}%`,
+        isPositive: (data?.total_providers.trend.direction ?? "up") === "up",
+        label: data?.total_providers.trend.text ?? "Up from yesterday",
       },
-      icon: <LiaUsersCogSolid  className="w-7 h-7 text-purple-600" />,
+      icon: <LiaUsersCogSolid className="w-7 h-7 text-purple-600" />,
       iconBgColor: "bg-purple-100",
     },
     {
       title: "Active Bookings",
-      value: "10293",
+      value: data?.active_bookings.value ?? "—",
       trend: {
-        value: "13%",
-        isPositive: true,
-        label: "Up from past week",
+        value: `${Math.abs(data?.active_bookings.trend.percent ?? 0)}%`,
+        isPositive: (data?.active_bookings.trend.direction ?? "up") === "up",
+        label: data?.active_bookings.trend.text ?? "Up from past week",
       },
       icon: <FaCalendarCheck className="w-7 h-7 text-green-600" />,
       iconBgColor: "bg-green-100",
     },
     {
       title: "Completed Jobs",
-      value: "4",
+      value: data?.completed_jobs.value ?? "—",
       trend: {
-        value: "13%",
-        isPositive: true,
-        label: "Up from past week",
+        value: `${Math.abs(data?.completed_jobs.trend.percent ?? 0)}%`,
+        isPositive: (data?.completed_jobs.trend.direction ?? "up") === "up",
+        label: data?.completed_jobs.trend.text ?? "Up from past week",
       },
       icon: <LuBadgeCheck className="w-7 h-7 text-pink-600" />,
       iconBgColor: "bg-pink-100",

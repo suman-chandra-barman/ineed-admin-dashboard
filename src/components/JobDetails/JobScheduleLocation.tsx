@@ -73,17 +73,6 @@ export default function JobScheduleLocation({
             {schedule.location.zipCode}
           </span>
         </div>
-
-        <div className="flex justify-between items-center pt-2">
-          <span className="text-sm text-gray-600">Pin Location :</span>
-          <button
-            onClick={handleMapClick}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            <FiMap className="w-4 h-4" />
-            Map
-          </button>
-        </div>
       </div>
     </div>
   );

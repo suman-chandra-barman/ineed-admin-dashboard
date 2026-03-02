@@ -3,32 +3,66 @@
 import React, { useState } from "react";
 import { FiEye } from "react-icons/fi";
 import { Pagination } from "../Shared/Pagination";
-
-interface Job {
-  jobId: string;
-  provider: string;
-  contactNumber: string;
-  category: string;
-  bookingDate: string;
-  completeDate: string;
-}
+import { JobHistoryItem } from "@/app/types/overview.type";
 
 interface JobHistoryTableProps {
-  jobs: Job[];
+  jobs: JobHistoryItem[];
+  totalPages?: number;
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
   onViewDetails?: (jobId: string) => void;
 }
 
 export const JobHistoryTable: React.FC<JobHistoryTableProps> = ({
   jobs,
+  totalPages: externalTotalPages,
+  currentPage: externalCurrentPage,
+  onPageChange: externalOnPageChange,
   onViewDetails,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [internalPage, setInternalPage] = useState(1);
   const itemsPerPage = 6;
 
-  const totalPages = Math.ceil(jobs.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentJobs = jobs.slice(startIndex, endIndex);
+  // Use external pagination if provided, otherwise paginate locally
+  const isExternalPagination =
+    externalTotalPages !== undefined &&
+    externalCurrentPage !== undefined &&
+    externalOnPageChange !== undefined;
+
+  const currentPage = isExternalPagination
+    ? externalCurrentPage!
+    : internalPage;
+  const totalPages = isExternalPagination
+    ? externalTotalPages!
+    : Math.ceil(jobs.length / itemsPerPage);
+
+  const displayedJobs = isExternalPagination
+    ? jobs
+    : jobs.slice(
+        (internalPage - 1) * itemsPerPage,
+        internalPage * itemsPerPage,
+      );
+
+  const handlePageChange = (page: number) => {
+    if (isExternalPagination) {
+      externalOnPageChange!(page);
+    } else {
+      setInternalPage(page);
+    }
+  };
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "—";
+    try {
+      return new Date(dateStr).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch {
+      return dateStr;
+    }
+  };
 
   return (
     <div className="rounded-xl border">
@@ -64,29 +98,29 @@ export const JobHistoryTable: React.FC<JobHistoryTableProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {currentJobs.map((job, index) => (
-              <tr key={index} className="hover:bg-gray-50 transition-colors">
+            {displayedJobs.map((job) => (
+              <tr key={job.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                  {job.jobId}
+                  {job.job_id}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {job.provider}
+                  {job.provider_name ?? "—"}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {job.contactNumber}
+                  {job.contact_number ?? "—"}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
                   {job.category}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {job.bookingDate}
+                  {formatDate(job.booking_date)}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {job.completeDate}
+                  {formatDate(job.complete_date)}
                 </td>
                 <td className="px-6 py-4">
                   <button
-                    onClick={() => onViewDetails?.(job.jobId)}
+                    onClick={() => onViewDetails?.(job.job_id)}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     aria-label="View job details"
                   >
@@ -99,13 +133,21 @@ export const JobHistoryTable: React.FC<JobHistoryTableProps> = ({
         </table>
       </div>
 
-      <div className="p-6 border-t border-gray-100">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
-      </div>
+      {jobs.length > 0 && (
+        <div className="p-6 border-t border-gray-100">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
+
+      {jobs.length === 0 && (
+        <div className="p-8 text-center text-gray-500">
+          No job history found.
+        </div>
+      )}
     </div>
   );
 };
