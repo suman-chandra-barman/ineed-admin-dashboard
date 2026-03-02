@@ -11,6 +11,7 @@ import {
   ResetPasswordResponse,
 } from "@/app/types/auth.type";
 import { baseApi } from "../../api/baseApi";
+import { updateUser } from "./authSlice";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -61,11 +62,44 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    getMe: builder.query<
+      {
+        success: boolean;
+        message: string;
+        data: {
+          user: {
+            id: string;
+            full_name: string;
+            email_address: string;
+            role: string;
+            profile_image: string | null;
+          };
+        };
+      },
+      void
+    >({
+      query: () => ({
+        url: "/auth/me/",
+        method: "GET",
+      }),
+      providesTags: ["User"],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data.success) {
+            dispatch(updateUser(data.data.user));
+          }
+        } catch {
+          // silently ignore
+        }
+      },
+    }),
   }),
 });
 
 export const {
   useVerifyEmailMutation,
+  useGetMeQuery,
   useLoginMutation,
   useForgotPasswordMutation,
   useVerifyResetOtpMutation,

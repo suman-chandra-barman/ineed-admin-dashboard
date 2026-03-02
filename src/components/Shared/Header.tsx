@@ -3,10 +3,14 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { ProfileDropdown } from "../Modals/ProfileDropdown";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 export function Header({ title }: { title: string }) {
+  const user = useSelector((state: RootState) => state.auth.user);
+
   return (
-    <header className="h-16 flex shrink-0 items-center gap-2 border-b bg-white px-4"> 
+    <header className="h-16 flex shrink-0 items-center gap-2 border-b bg-white px-4">
       <div className="flex items-center gap-2 flex-1">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="h-6" />
@@ -17,10 +21,7 @@ export function Header({ title }: { title: string }) {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <ProfileDropdown
-          userName="Suman"
-          settingsLink="/settings"
-        />
+        <ProfileDropdown user={user} />
       </div>
     </header>
   );
