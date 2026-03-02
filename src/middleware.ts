@@ -17,14 +17,6 @@ export function middleware(request: NextRequest) {
 
   const isAdmin = role === "admin";
 
-  console.log("=== MIDDLEWARE EXECUTED ===");
-  console.log("Path:", path);
-  console.log("Token:", token ? "EXISTS" : "MISSING");
-  console.log("Role:", role);
-  console.log("Is Admin:", isAdmin);
-  console.log("Is Public Path:", isPublicPath);
-  console.log("===========================");
-
   // Auth pages are only blocked for authenticated admin users.
   if (isPublicPath && token && isAdmin) {
     return NextResponse.redirect(new URL("/", request.url));
