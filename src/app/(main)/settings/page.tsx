@@ -4,33 +4,16 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Pencil } from "lucide-react";
 import Image from "next/image";
-import EditUserInfoModal, {
-  UserInfoData,
-} from "@/components/Modals/EditUserInfoModal";
-import ChangePasswordModal, {
-  PasswordData,
-} from "@/components/Modals/ChangePasswordModal";
+import EditUserInfoModal from "@/components/Modals/EditUserInfoModal";
+import ChangePasswordModal from "@/components/Modals/ChangePasswordModal";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 export default function SettingsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
-  const [userInfo, setUserInfo] = useState<UserInfoData>({
-    fullName: "Suman",
-    email: "name@gmail.com",
-    avatar: "", // You can add a default avatar URL here
-  });
-
-  const handleSaveUserInfo = (data: UserInfoData) => {
-    setUserInfo(data);
-    console.log("User info updated:", data);
-    // Here you would typically make an API call to update the user info
-  };
-
-  const handleSavePassword = (data: PasswordData) => {
-    console.log("Password update requested:", data);
-    // Here you would typically make an API call to update the password
-  };
+  const user = useSelector((state: RootState) => state.auth.user);
 
   return (
     <main className="max-w-5xl">
@@ -54,10 +37,10 @@ export default function SettingsPage() {
           <div className="w-52 rounded-2xl border-2 border-primary/30 p-6 bg-card flex flex-col items-center">
             {/* Avatar */}
             <div className="w-28 h-28 rounded-full overflow-hidden bg-muted mb-4">
-              {userInfo.avatar ? (
+              {user?.profile_image ? (
                 <Image
-                  src={userInfo.avatar}
-                  alt={userInfo.fullName}
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${user.profile_image}`}
+                  alt={user.full_name ?? ""}
                   width={112}
                   height={112}
                   className="w-full h-full object-cover"
@@ -65,20 +48,20 @@ export default function SettingsPage() {
               ) : (
                 <div className="w-full h-full bg-linear-to-br from-primary/30 to-primary/10 flex items-center justify-center">
                   <span className="text-4xl font-bold text-primary">
-                    {userInfo.fullName.charAt(0).toUpperCase()}
+                    {user?.full_name?.charAt(0).toUpperCase()}
                   </span>
                 </div>
               )}
             </div>
-            
+
             {/* Admin Label */}
             <span className="text-sm font-medium text-muted-foreground mb-1">
               Admin
             </span>
-            
+
             {/* Name */}
             <span className="text-xl font-semibold text-foreground">
-              {userInfo.fullName.split(" ")[0]}
+              {user?.full_name}
             </span>
           </div>
         </div>
@@ -87,12 +70,12 @@ export default function SettingsPage() {
         <div className="flex-1 space-y-4">
           {/* Full Name Field */}
           <div className="bg-card rounded-lg px-4 py-3 border border-border">
-            <p className="text-foreground">{userInfo.fullName}</p>
+            <p className="text-foreground">{user?.full_name}</p>
           </div>
 
           {/* Email Field */}
           <div className="bg-card rounded-lg px-4 py-3 border border-border">
-            <p className="text-muted-foreground">{userInfo.email}</p>
+            <p className="text-muted-foreground">{user?.email_address}</p>
           </div>
 
           {/* Change Password Button */}
@@ -110,14 +93,12 @@ export default function SettingsPage() {
       <EditUserInfoModal
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
-        onSave={handleSaveUserInfo}
-        initialData={userInfo}
+        user={user}
       />
 
       <ChangePasswordModal
         open={isPasswordModalOpen}
         onOpenChange={setIsPasswordModalOpen}
-        onSave={handleSavePassword}
       />
     </main>
   );

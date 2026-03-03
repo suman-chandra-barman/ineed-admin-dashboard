@@ -1,61 +1,41 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useChangePasswordMutation } from "@/redux/features/auth/authApi";
+import { toast } from "sonner";
 
 interface ChangePasswordModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (data: PasswordData) => void;
-}
-
-export interface PasswordData {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
 }
 
 export default function ChangePasswordModal({
   open,
   onOpenChange,
-  onSave,
 }: ChangePasswordModalProps) {
-  const [formData, setFormData] = useState<PasswordData>({
-    currentPassword: "",
+  const [formData, setFormData] = useState({
     newPassword: "",
     confirmPassword: "",
   });
 
   const [showPasswords, setShowPasswords] = useState({
-    current: false,
     new: false,
     confirm: false,
   });
 
   const [errors, setErrors] = useState({
-    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  const validateForm = () => {
-    const newErrors = {
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    };
+  const [changePassword, { isLoading }] = useChangePasswordMutation();
 
-    if (!formData.currentPassword) {
-      newErrors.currentPassword = "Current password is required";
-    }
+  const validateForm = () => {
+    const newErrors = { newPassword: "", confirmPassword: "" };
 
     if (!formData.newPassword) {
       newErrors.newPassword = "New password is required";
@@ -70,40 +50,36 @@ export default function ChangePasswordModal({
     }
 
     setErrors(newErrors);
-    return !Object.values(newErrors).some((error) => error !== "");
+    return !Object.values(newErrors).some((e) => e !== "");
   };
 
-  const handleSave = () => {
-    if (validateForm()) {
-      onSave(formData);
+  const handleSave = async () => {
+    if (!validateForm()) return;
+    try {
+      await changePassword({
+        new_password: formData.newPassword,
+        confirm_password: formData.confirmPassword,
+      }).unwrap();
+      toast.success("Password changed successfully");
       handleCancel();
+    } catch {
+      toast.error("Failed to change password");
     }
   };
 
   const handleCancel = () => {
-    setFormData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-    setErrors({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
+    setFormData({ newPassword: "", confirmPassword: "" });
+    setErrors({ newPassword: "", confirmPassword: "" });
     onOpenChange(false);
   };
 
-  const togglePasswordVisibility = (field: "current" | "new" | "confirm") => {
-    setShowPasswords((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
+  const togglePasswordVisibility = (field: "new" | "confirm") => {
+    setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[520px]">
+      <DialogContent className="sm:max-w-130">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-semibold">
             Change Password
@@ -114,45 +90,6 @@ export default function ChangePasswordModal({
         </DialogHeader>
 
         <div className="space-y-5 py-6">
-          {/* Current Password */}
-          <div className="space-y-2">
-            <label
-              htmlFor="currentPassword"
-              className="text-sm font-medium text-foreground"
-            >
-              Current Password
-            </label>
-            <div className="relative">
-              <Input
-                id="currentPassword"
-                type={showPasswords.current ? "text" : "password"}
-                placeholder="Enter current password"
-                value={formData.currentPassword}
-                onChange={(e) => {
-                  setFormData({ ...formData, currentPassword: e.target.value });
-                  setErrors({ ...errors, currentPassword: "" });
-                }}
-                className={`w-full pr-10 ${
-                  errors.currentPassword ? "border-destructive" : ""
-                }`}
-              />
-              <button
-                type="button"
-                onClick={() => togglePasswordVisibility("current")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {showPasswords.current ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-            {errors.currentPassword && (
-              <p className="text-xs text-destructive">{errors.currentPassword}</p>
-            )}
-          </div>
-
           {/* New Password */}
           <div className="space-y-2">
             <label
@@ -227,7 +164,9 @@ export default function ChangePasswordModal({
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-xs text-destructive">{errors.confirmPassword}</p>
+              <p className="text-xs text-destructive">
+                {errors.confirmPassword}
+              </p>
             )}
           </div>
         </div>
@@ -237,15 +176,24 @@ export default function ChangePasswordModal({
           <Button
             variant="outline"
             onClick={handleCancel}
+            disabled={isLoading}
             className="flex-1"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
+            disabled={isLoading}
             className="flex-1 bg-primary hover:bg-primary/90"
           >
-            Update Password
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Update Password"
+            )}
           </Button>
         </div>
       </DialogContent>

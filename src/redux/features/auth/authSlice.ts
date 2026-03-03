@@ -6,13 +6,7 @@ import {
   removeUserFromStorage,
 } from "@/lib/auth-storage";
 import { RootState } from "@/redux/store";
-
-interface User {
-  id: string;
-  full_name: string;
-  email_address: string;
-  role: string;
-}
+import { User } from "@/app/types/auth.type";
 
 interface AuthState {
   user: User | null;
@@ -72,16 +66,14 @@ const authSlice = createSlice({
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
-
-        if (typeof window !== "undefined") {
-          localStorage.setItem("user", JSON.stringify(state.user));
-        }
+        saveUserToStorage(state.user);
       }
     },
   },
 });
 
-export const { setCredentials, logout, hydrate, updateUser } = authSlice.actions;
+export const { setCredentials, logout, hydrate, updateUser } =
+  authSlice.actions;
 
 export default authSlice.reducer;
 

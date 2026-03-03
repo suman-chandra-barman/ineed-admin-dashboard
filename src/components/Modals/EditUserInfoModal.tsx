@@ -1,76 +1,78 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Camera } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
 import Image from "next/image";
+import { User } from "@/app/types/auth.type";
+import { useUpdateProfileMutation } from "@/redux/features/auth/authApi";
+import { toast } from "sonner";
 
 interface EditUserInfoModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (data: UserInfoData) => void;
-  initialData?: UserInfoData;
-}
-
-export interface UserInfoData {
-  fullName: string;
-  email: string;
-  avatar?: string;
+  onSave?: () => void;
+  user: User | null;
 }
 
 export default function EditUserInfoModal({
   open,
   onOpenChange,
   onSave,
-  initialData,
+  user,
 }: EditUserInfoModalProps) {
-  const [formData, setFormData] = useState<UserInfoData>({
-    fullName: initialData?.fullName || "",
-    email: initialData?.email || "",
-    avatar: initialData?.avatar || "",
-  });
+  const [fullName, setFullName] = useState(user?.full_name ?? "");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string>(
-    initialData?.avatar || ""
+    user?.profile_image
+      ? `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${user.profile_image}`
+      : "",
   );
+
+  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setPreviewImage(result);
-        setFormData({ ...formData, avatar: result });
-      };
+      reader.onloadend = () => setPreviewImage(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSave = () => {
-    onSave(formData);
-    onOpenChange(false);
+  const handleSave = async () => {
+    const formData = new FormData();
+    formData.append("full_name", fullName);
+    if (imageFile) {
+      formData.append("profile_image", imageFile);
+    }
+    try {
+      await updateProfile(formData).unwrap();
+      toast.success("Profile updated successfully");
+      onSave?.();
+      onOpenChange(false);
+    } catch {
+      toast.error("Failed to update profile");
+    }
   };
 
   const handleCancel = () => {
-    setFormData({
-      fullName: initialData?.fullName || "",
-      email: initialData?.email || "",
-      avatar: initialData?.avatar || "",
-    });
-    setPreviewImage(initialData?.avatar || "");
+    setFullName(user?.full_name ?? "");
+    setImageFile(null);
+    setPreviewImage(
+      user?.profile_image
+        ? `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${user.profile_image}`
+        : "",
+    );
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[520px]">
+      <DialogContent className="sm:max-w-130">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-semibold">
             Edit Account Info
@@ -94,9 +96,9 @@ export default function EditUserInfoModal({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                  <div className="w-full h-full bg-linear-to-br from-primary/20 to-primary/5 flex items-center justify-center">
                     <span className="text-4xl font-semibold text-primary">
-                      {formData.fullName.charAt(0).toUpperCase() || "U"}
+                      {fullName.charAt(0).toUpperCase() || "U"}
                     </span>
                   </div>
                 )}
@@ -129,15 +131,13 @@ export default function EditUserInfoModal({
               id="fullName"
               type="text"
               placeholder="Enter your full name"
-              value={formData.fullName}
-              onChange={(e) =>
-                setFormData({ ...formData, fullName: e.target.value })
-              }
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               className="w-full"
             />
           </div>
 
-          {/* Email Input */}
+          {/* Email - read only */}
           <div className="space-y-2">
             <label
               htmlFor="email"
@@ -148,12 +148,10 @@ export default function EditUserInfoModal({
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              className="w-full"
+              value={user?.email_address ?? ""}
+              readOnly
+              disabled
+              className="w-full bg-muted cursor-not-allowed"
             />
           </div>
         </div>
@@ -163,16 +161,24 @@ export default function EditUserInfoModal({
           <Button
             variant="outline"
             onClick={handleCancel}
+            disabled={isLoading}
             className="flex-1"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
-            disabled={!formData.fullName || !formData.email}
+            disabled={!fullName || isLoading}
             className="flex-1 bg-primary hover:bg-primary/90"
           >
-            Save Changes
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </div>
       </DialogContent>
