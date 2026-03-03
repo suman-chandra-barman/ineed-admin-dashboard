@@ -106,6 +106,7 @@ function VerifyResetOtpContent() {
               full_name: response.user.full_name,
               email_address: response.user.email,
               role: response.user.role,
+              profile_image: null,
             },
             tokens: {
               access: response.accessToken,

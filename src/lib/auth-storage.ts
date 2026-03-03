@@ -1,12 +1,6 @@
 // Utility functions for managing auth tokens in localStorage and cookies
 
-interface User {
-  id: string;
-  full_name: string;
-  email_address: string;
-  role: string;
-  profile_image?: string | null;
-}
+import { User } from "@/app/types/auth.type";
 
 export const saveTokenToStorage = (token: string, refreshToken: string) => {
   if (typeof window !== "undefined") {

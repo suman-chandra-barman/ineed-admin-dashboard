@@ -10,7 +10,7 @@ interface JobHistoryTableProps {
   totalPages?: number;
   currentPage?: number;
   onPageChange?: (page: number) => void;
-  onViewDetails?: (jobId: string) => void;
+  onViewDetails?: (jobId: number) => void;
 }
 
 export const JobHistoryTable: React.FC<JobHistoryTableProps> = ({

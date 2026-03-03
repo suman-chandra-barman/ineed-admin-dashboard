@@ -5,6 +5,7 @@ import { FiEye } from "react-icons/fi";
 import { Pagination } from "../Shared/Pagination";
 
 interface ProviderJob {
+  id: number;
   jobId: string;
   customerName: string;
   service: string;
@@ -22,7 +23,7 @@ interface ProviderJob {
 interface ProviderJobTableProps {
   title: string;
   jobs: ProviderJob[];
-  onViewDetails?: (jobId: string) => void;
+  onViewDetails?: (jobId: number) => void;
   itemsPerPage?: number;
 }
 
