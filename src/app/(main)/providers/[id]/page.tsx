@@ -40,6 +40,7 @@ const mapJobStatus = (status: string): JobStatus => {
 };
 
 const mapJob = (job: ProviderJobHistory) => ({
+  id: job.id,
   jobId: job.job_id,
   customerName: job.customer_name,
   service: job.service,
@@ -60,7 +61,7 @@ export default function ProviderDetailsPage({
     console.log("Disable account");
   };
 
-  const handleViewJobDetails = (jobId: string) => {
+  const handleViewJobDetails = (jobId:number) => {
     router.push(`job/${jobId}`);
   };
 

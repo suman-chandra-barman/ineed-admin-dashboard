@@ -25,7 +25,7 @@ export default function CustomerDetailsPage({
     console.log("Disable account");
   };
 
-  const handleViewJobDetails = (jobId: string) => {
+  const handleViewJobDetails = (jobId:number) => {
     router.push(`job/${jobId}`);
   };
 

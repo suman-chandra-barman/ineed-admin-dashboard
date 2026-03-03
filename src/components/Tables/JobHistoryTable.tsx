@@ -120,7 +120,7 @@ export const JobHistoryTable: React.FC<JobHistoryTableProps> = ({
                 </td>
                 <td className="px-6 py-4">
                   <button
-                    onClick={() => onViewDetails?.(job.job_id)}
+                    onClick={() => onViewDetails?.(job.id)}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     aria-label="View job details"
                   >

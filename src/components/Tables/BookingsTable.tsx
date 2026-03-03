@@ -26,6 +26,7 @@ const getStatusStyle = (status: string) => {
     default:
       return "bg-gray-100 text-gray-700";
   }
+  
 };
 
 export function BookingsTable() {
