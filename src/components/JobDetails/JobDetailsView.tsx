@@ -107,7 +107,6 @@ export default function JobDetailsView({ jobId }: JobDetailsViewProps) {
       description: `Duration: ${item.duration}`,
       duration: item.duration,
       price: item.price,
-      image: "/service-placeholder.jpg",
     }),
   );
 

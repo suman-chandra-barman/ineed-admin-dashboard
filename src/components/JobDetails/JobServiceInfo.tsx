@@ -1,13 +1,9 @@
-import React from "react";
-import Image from "next/image";
-
 interface Service {
   id: string;
   name: string;
   description: string;
   duration: string;
   price: number;
-  image: string;
 }
 
 interface JobServiceInfoProps {
@@ -30,16 +26,6 @@ export default function JobServiceInfo({ services }: JobServiceInfoProps) {
             <div className="flex items-start justify-between gap-4">
               {/* Service Image and Details */}
               <div className="flex items-start gap-3 flex-1">
-                <div className="w-12 h-12 rounded-lg bg-gray-100 shrink-0 overflow-hidden">
-                  <Image
-                    src={service.image}
-                    alt={service.name}
-                    width={48}
-                    height={48}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
                 <div className="flex-1">
                   <h4 className="text-sm font-semibold text-gray-900">
                     {service.name}
