@@ -525,11 +525,13 @@ export default function EditServiceForm({
             </div>
           </div>
 
-          {/* Service Hours Section */}
-          <ServiceHours
-            onChange={handleServiceHoursChange}
-            initialHours={serviceHours}
-          />
+          {/* Service Hours Section — only mount once real data is available */}
+          {data?.data?.service_hours && (
+            <ServiceHours
+              onChange={handleServiceHoursChange}
+              initialHours={data.data.service_hours}
+            />
+          )}
         </div>
       </div>
 

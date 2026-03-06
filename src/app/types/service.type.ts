@@ -78,10 +78,13 @@ export interface CreateAdditionalFeatureResponse {
 }
 
 export interface ServiceHour {
+  id?: number;
+  service_id?: number;
   day_of_week: number;
   from_time: string;
   to_time: string;
   is_closed: boolean;
+  created_at?: string;
 }
 
 export interface CreateServiceRequest {

@@ -19,7 +19,8 @@ export default function ServiceHours({
   onChange,
   initialHours,
 }: ServiceHoursProps) {
-  const initializedRef = useRef(false);
+  // If no initialHours provided (add mode), we're already initialized
+  const initializedRef = useRef(!initialHours || initialHours.length === 0);
 
   const [schedule, setSchedule] = useState<DaySchedule[]>([
     {
@@ -71,10 +72,11 @@ export default function ServiceHours({
     if (initialHours && initialHours.length > 0 && !initializedRef.current) {
       const dayNames = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
       const newSchedule = initialHours.map((hour, index) => ({
-        day: dayNames[hour.day_of_week] || dayNames[index],
+        day: dayNames[hour.day_of_week] ?? dayNames[index],
         enabled: !hour.is_closed,
-        startTime: hour.from_time || "09:00",
-        endTime: hour.to_time || "18:00",
+        // Strip seconds from "HH:MM:SS" if present
+        startTime: (hour.from_time || "09:00").slice(0, 5),
+        endTime: (hour.to_time || "18:00").slice(0, 5),
       }));
       setSchedule(newSchedule);
       initializedRef.current = true;

@@ -100,7 +100,7 @@ export const serviceApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: "/services/admin/services/",
+          url: "/services/admin/create-full-service/",
           method: "POST",
           body: formData,
         };
