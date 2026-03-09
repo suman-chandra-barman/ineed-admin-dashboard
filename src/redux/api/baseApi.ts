@@ -40,5 +40,6 @@ export const baseApi = createApi({
     "Payments",
     "Bookings",
     "Support",
+    "Booking"
   ],
 });

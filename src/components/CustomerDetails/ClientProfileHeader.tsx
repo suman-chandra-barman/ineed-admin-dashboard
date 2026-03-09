@@ -4,20 +4,43 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { Ban, MessageCircle } from "lucide-react";
+import { useCreateAdminProviderRoomByBookingMutation } from "@/redux/features/chat/adminProviderChatApi";
+import { useRouter } from "next/navigation";
 
 interface ClientProfileHeaderProps {
   name: string;
   userId: string;
   imageUrl: string;
-  onDelete?: () => void;
+  todayBookingId?: number | undefined;
+  previousBookingId?: number | undefined;
 }
 
 export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
   name,
   userId,
   imageUrl,
-  onDelete,
+  todayBookingId,
+  previousBookingId,
 }) => {
+  const router = useRouter();
+
+  const [createRoom, { isLoading: openingChat }] =
+    useCreateAdminProviderRoomByBookingMutation();
+
+  const handleOpenChat = async (bookingId: number) => {
+    console.log("Opening chat for booking ID:", bookingId);
+    try {
+      const res = await createRoom(bookingId).unwrap();
+      router.push(`/messages?roomId=${res.data.id}`);
+    } catch (error) {
+      console.error("Failed to open chat room", error);
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    console.log("Disable account");
+  };
+
   return (
     <div className="flex items-start justify-between">
       <div className="flex items-center gap-4">
@@ -31,11 +54,17 @@ export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-4">
-        <Button>
+        <Button
+          onClick={() => {
+            const bookingId = todayBookingId ?? previousBookingId;
+            if (bookingId !== undefined) handleOpenChat(bookingId);
+          }}
+          disabled={!todayBookingId && !previousBookingId}
+        >
           <MessageCircle className="w-4 h-4" />
-          Chat
+          {openingChat ? "Opening..." : "Chat"}
         </Button>
-        <Button onClick={onDelete} variant="outline">
+        <Button onClick={handleDeleteAccount} variant="outline">
           <Ban className="w-4 h-4" />
           Disable Account
         </Button>

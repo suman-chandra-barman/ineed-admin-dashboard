@@ -57,10 +57,6 @@ export default function ProviderDetailsPage({
 
   const { data, isLoading, isError } = useGetProviderDetailsQuery(id);
 
-  const handleDeleteAccount = () => {
-    console.log("Disable account");
-  };
-
   const handleViewJobDetails = (jobId:number) => {
     router.push(`job/${jobId}`);
   };
@@ -98,7 +94,8 @@ export default function ProviderDetailsPage({
             name={provider.full_name}
             userId={provider.normal_id}
             imageUrl={imageUrl}
-            onDelete={handleDeleteAccount}
+            todayBookingId={today_jobs.length > 0 ? today_jobs[0].id : undefined}
+            previousBookingId={job_history.results.length > 0 ? job_history.results[0].id : undefined}
           />
 
           {/* Provider Info Cards */}

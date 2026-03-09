@@ -11,6 +11,7 @@ import { LoadingSpinner } from "@/components/Shared/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useGetBookingDetailQuery } from "@/redux/features/bookings/bookingApi";
+import { useCreateAdminProviderRoomByBookingMutation } from "@/redux/features/chat/adminProviderChatApi";
 
 interface JobDetailsViewProps {
   jobId: number;
@@ -28,11 +29,19 @@ export default function JobDetailsView({ jobId }: JobDetailsViewProps) {
     skip: !jobId || isNaN(jobId),
   });
 
+  const [createRoom, { isLoading: openingChat }] =
+    useCreateAdminProviderRoomByBookingMutation();
+
   const bookingData = bookingResponse?.data;
 
-  const handleChatClick = () => {
-    if (bookingData?.provider_details?.id) {
-      router.push(`/messages?provider=${bookingData.provider_details.id}`);
+  const handleChatClick = async () => {
+    if (bookingData?.id) {
+      try {
+        const res = await createRoom(bookingData.id).unwrap();
+        router.push(`/messages?roomId=${res.data.id}`);
+      } catch (error) {
+        console.error("Failed to open chat room", error);
+      }
     }
   };
 
@@ -58,7 +67,7 @@ export default function JobDetailsView({ jobId }: JobDetailsViewProps) {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white p-4 lg:p-6 rounded-2xl flex items-center justify-center">
-        <LoadingSpinner text="Loading job details..."/>
+        <LoadingSpinner text="Loading job details..." />
       </div>
     );
   }

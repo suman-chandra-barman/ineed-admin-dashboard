@@ -24,9 +24,6 @@ export default function ChatInput({
   return (
     <div className="p-2 sm:p-4 border-t bg-white">
       <div className="flex items-center gap-2 sm:gap-3">
-        <Button variant="ghost" size="icon" className="shrink-0 hidden sm:flex">
-          <Plus className="w-5 h-5" />
-        </Button>
         <Input
           type="text"
           placeholder="Write your message..."

@@ -21,9 +21,6 @@ export default function CustomerDetailsPage({
 
   const { data, isLoading, isError } = useGetUserDetailsQuery(id);
 
-  const handleDeleteAccount = () => {
-    console.log("Disable account");
-  };
 
   const handleViewJobDetails = (jobId:number) => {
     router.push(`job/${jobId}`);
@@ -61,7 +58,6 @@ export default function CustomerDetailsPage({
             name={user.full_name}
             userId={user.normal_id}
             imageUrl={imageUrl}
-            onDelete={handleDeleteAccount}
           />
 
           {/* Client Info Cards */}
