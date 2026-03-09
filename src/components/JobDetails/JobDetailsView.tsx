@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useGetBookingDetailQuery } from "@/redux/features/bookings/bookingApi";
 import { useCreateAdminProviderRoomByBookingMutation } from "@/redux/features/chat/adminProviderChatApi";
+import { encodeAdminProviderRoomId } from "@/lib/admin-provider-chat-mappers";
 
 interface JobDetailsViewProps {
   jobId: number;
@@ -38,7 +39,8 @@ export default function JobDetailsView({ jobId }: JobDetailsViewProps) {
     if (bookingData?.id) {
       try {
         const res = await createRoom(bookingData.id).unwrap();
-        router.push(`/messages?roomId=${res.data.id}`);
+        const syntheticRoomId = encodeAdminProviderRoomId(res.data.id);
+        router.push(`/messages?roomId=${syntheticRoomId}`);
       } catch (error) {
         console.error("Failed to open chat room", error);
       }

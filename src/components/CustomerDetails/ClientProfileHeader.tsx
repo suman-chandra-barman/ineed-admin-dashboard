@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { Ban, MessageCircle } from "lucide-react";
 import { useCreateAdminProviderRoomByBookingMutation } from "@/redux/features/chat/adminProviderChatApi";
 import { useRouter } from "next/navigation";
+import { encodeAdminProviderRoomId } from "@/lib/admin-provider-chat-mappers";
 
 interface ClientProfileHeaderProps {
   name: string;
@@ -28,10 +29,10 @@ export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
     useCreateAdminProviderRoomByBookingMutation();
 
   const handleOpenChat = async (bookingId: number) => {
-    console.log("Opening chat for booking ID:", bookingId);
     try {
       const res = await createRoom(bookingId).unwrap();
-      router.push(`/messages?roomId=${res.data.id}`);
+      const syntheticRoomId = encodeAdminProviderRoomId(res.data.id);
+      router.push(`/messages?roomId=${syntheticRoomId}`);
     } catch (error) {
       console.error("Failed to open chat room", error);
     }

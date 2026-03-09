@@ -4,5 +4,7 @@ export function createAdminProviderChatSocket(roomId: number, token: string) {
     ? rawBase.replace("https://", "wss://")
     : rawBase.replace("http://", "ws://");
 
-  return new WebSocket(`${wsBase}/ws/admin-provider-chat/${roomId}/?token=${token}`);
+  // IMPORTANT:
+  // admin side-ও এখন unified ws path use করবে
+  return new WebSocket(`${wsBase}/ws/chat/${roomId}/?token=${token}`);
 }

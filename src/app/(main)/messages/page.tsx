@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import ChatSidebar from "@/components/Chat/ChatSidebar";
 import ChatHeader from "@/components/Chat/ChatHeader";
 import ChatMessages from "@/components/Chat/ChatMessages";
@@ -32,6 +33,9 @@ interface UIMessage {
 }
 
 export default function AdminMessagesPage() {
+  const searchParams = useSearchParams();
+  const roomIdFromQuery = searchParams.get("roomId");
+
   const user = useAppSelector(selectCurrentUser);
   const token = useAppSelector(selectCurrentToken);
 
@@ -63,10 +67,22 @@ export default function AdminMessagesPage() {
   const currentUserId = user?.id || "";
 
   useEffect(() => {
+    if (roomIdFromQuery && conversations.length > 0) {
+      const match = conversations.find(
+        (c) => String(c.roomId) === String(roomIdFromQuery),
+      );
+
+      if (match) {
+        setSelectedConversation(match.id);
+        setShowMobileSidebar(false);
+        return;
+      }
+    }
+
     if (!selectedConversation && conversations.length > 0) {
       setSelectedConversation(conversations[0].id);
     }
-  }, [conversations, selectedConversation]);
+  }, [conversations, selectedConversation, roomIdFromQuery]);
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -112,10 +128,18 @@ export default function AdminMessagesPage() {
           currentUserId,
         );
 
-        setMessages((prev) => ({
-          ...prev,
-          [selectedConv.id]: [...(prev[selectedConv.id] || []), uiMessage],
-        }));
+        setMessages((prev) => {
+          const existing = prev[selectedConv.id] || [];
+          const alreadyExists = existing.some(
+            (msg) => String(msg.id) === String(uiMessage.id),
+          );
+          if (alreadyExists) return prev;
+
+          return {
+            ...prev,
+            [selectedConv.id]: [...existing, uiMessage],
+          };
+        });
 
         markRead(selectedConv.roomId);
         refetch();

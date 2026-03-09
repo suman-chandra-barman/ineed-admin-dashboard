@@ -19,6 +19,7 @@ export const adminProviderChatApi = baseApi.injectEndpoints({
       invalidatesTags: ["Booking"],
     }),
 
+    // room list old dedicated endpoint-এই থাকবে
     getAdminProviderRooms: builder.query<AdminProviderChatRoomsResponse, void>({
       query: () => ({
         url: "/bookings/chat/admin-provider/rooms/",
@@ -27,23 +28,25 @@ export const adminProviderChatApi = baseApi.injectEndpoints({
       providesTags: ["Booking"],
     }),
 
+    // messages generic unified endpoint use করবে
     getAdminProviderMessages: builder.query<
       AdminProviderChatMessagesResponse,
       number
     >({
       query: (roomId) => ({
-        url: `/bookings/chat/admin-provider/rooms/${roomId}/messages/`,
+        url: `/bookings/chat/rooms/${roomId}/messages/`,
         method: "GET",
       }),
       providesTags: ["Booking"],
     }),
 
+    // read generic unified endpoint use করবে
     markAdminProviderRead: builder.mutation<
       AdminProviderMarkReadResponse,
       number
     >({
       query: (roomId) => ({
-        url: `/bookings/chat/admin-provider/rooms/${roomId}/read/`,
+        url: `/bookings/chat/rooms/${roomId}/read/`,
         method: "POST",
       }),
       invalidatesTags: ["Booking"],

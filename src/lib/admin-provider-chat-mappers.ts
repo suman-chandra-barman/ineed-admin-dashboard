@@ -3,6 +3,12 @@ import type {
   AdminProviderChatRoomItem,
 } from "@/app/types/admin-chat.type";
 
+export const ADMIN_PROVIDER_ROOM_ID_OFFSET = 1000000000;
+
+export function encodeAdminProviderRoomId(roomId: number) {
+  return ADMIN_PROVIDER_ROOM_ID_OFFSET + Number(roomId);
+}
+
 function formatTime(value?: string | null) {
   if (!value) return "";
   const date = new Date(value);
@@ -23,10 +29,14 @@ function getInitials(name?: string | null) {
     .toUpperCase();
 }
 
-export function mapAdminProviderRoomToConversation(room: AdminProviderChatRoomItem) {
+export function mapAdminProviderRoomToConversation(
+  room: AdminProviderChatRoomItem,
+) {
+  const syntheticRoomId = encodeAdminProviderRoomId(room.id);
+
   return {
-    id: String(room.id),
-    roomId: room.id,
+    id: String(syntheticRoomId),
+    roomId: syntheticRoomId,
     bookingId: room.booking_id,
     bookingCode: room.booking_code,
     bookingStatus: room.booking_status,
