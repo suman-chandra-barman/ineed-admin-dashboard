@@ -13,7 +13,7 @@ interface ProviderInfoProps {
   totalJobs: number;
   completedJobs: number;
   pendingJobs: number;
-  availableDays: string;
+  availableDays: string[];
   availableTimes: string;
 }
 
@@ -66,7 +66,7 @@ const userInfo = [
   },
   {
     label: "Available Days",
-    value: availableDays,
+    value: availableDays.join(", "),
     icon: <CalendarDays className="w-5 h-5 text-indigo-600" />,
     iconBgColor: "bg-indigo-100",
   },

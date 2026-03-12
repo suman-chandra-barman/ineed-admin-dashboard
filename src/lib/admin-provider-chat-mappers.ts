@@ -1,6 +1,6 @@
 import type {
-  AdminProviderChatMessageItem,
-  AdminProviderChatRoomItem,
+  AdminChatMessageItem,
+  AdminChatRoomItem,
 } from "@/app/types/admin-chat.type";
 
 export const ADMIN_PROVIDER_ROOM_ID_OFFSET = 1000000000;
@@ -29,20 +29,29 @@ function getInitials(name?: string | null) {
     .toUpperCase();
 }
 
-export function mapAdminProviderRoomToConversation(
-  room: AdminProviderChatRoomItem,
-) {
-  const syntheticRoomId = encodeAdminProviderRoomId(room.id);
+export function mapAdminProviderRoomToConversation(room: AdminChatRoomItem) {
+  console.log("Mapping room:", room);
+  
+  const isProviderChat = room.chat_type === "admin_provider";
+  // Backend already returns unique IDs with offset applied, no need to encode again
+  const roomId = room.id;
+
+  const name = isProviderChat
+    ? room.provider_name
+    : room.customer_name || "User";
+
+  const avatarUrl = isProviderChat ? room.provider_image : room.customer_image;
 
   return {
-    id: String(syntheticRoomId),
-    roomId: syntheticRoomId,
+    id: String(roomId),
+    roomId,
     bookingId: room.booking_id,
     bookingCode: room.booking_code,
     bookingStatus: room.booking_status,
-    name: room.provider_name,
-    avatar: getInitials(room.provider_name),
-    avatarUrl: room.provider_image,
+    chatType: room.chat_type,
+    name,
+    avatar: getInitials(name),
+    avatarUrl,
     lastMessage: room.last_message?.message || "",
     timestamp: formatTime(room.last_message?.created_at || room.updated_at),
     unreadCount: room.unread_count,
@@ -52,7 +61,7 @@ export function mapAdminProviderRoomToConversation(
 }
 
 export function mapAdminProviderMessageToUI(
-  msg: AdminProviderChatMessageItem,
+  msg: AdminChatMessageItem,
   currentUserId: string,
 ) {
   const isMine = String(msg.sender) === String(currentUserId);
@@ -63,6 +72,7 @@ export function mapAdminProviderMessageToUI(
     content: msg.message,
     timestamp: formatTime(msg.created_at),
     isRead: msg.is_read,
+    attachment: msg.attachment || null,
     createdAt: msg.created_at,
   };
 }
@@ -84,6 +94,7 @@ export function mapAdminProviderSocketMessageToUI(
     content: data.message,
     timestamp: formatTime(data.created_at),
     isRead: false,
+    attachment: null,
     createdAt: data.created_at,
   };
 }

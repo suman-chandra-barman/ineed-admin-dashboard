@@ -30,6 +30,7 @@ interface UIMessage {
   timestamp: string;
   isRead: boolean;
   createdAt?: string;
+  attachment?: string | null;
 }
 
 export default function AdminMessagesPage() {
@@ -54,6 +55,7 @@ export default function AdminMessagesPage() {
     isLoading: roomsLoading,
     refetch,
   } = useGetAdminProviderRoomsQuery();
+
   const [getMessages] = useLazyGetAdminProviderMessagesQuery();
   const [markRead] = useMarkAdminProviderReadMutation();
 
@@ -102,7 +104,7 @@ export default function AdminMessagesPage() {
         await markRead(selectedConv.roomId).unwrap();
         refetch();
       } catch (error) {
-        console.error("Failed to load admin/provider messages", error);
+        console.error("Failed to load messages", error);
       }
     };
 
@@ -147,7 +149,7 @@ export default function AdminMessagesPage() {
     };
 
     socket.onerror = (error) => {
-      console.error("admin/provider socket error", error);
+      console.error("admin chat socket error", error);
     };
 
     return () => {

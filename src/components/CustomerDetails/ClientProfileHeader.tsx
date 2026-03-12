@@ -4,9 +4,8 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { Ban, MessageCircle } from "lucide-react";
-import { useCreateAdminProviderRoomByBookingMutation } from "@/redux/features/chat/adminProviderChatApi";
 import { useRouter } from "next/navigation";
-import { encodeAdminProviderRoomId } from "@/lib/admin-provider-chat-mappers";
+import { useCreateAdminProviderRoomByBookingMutation } from "@/redux/features/chat/adminProviderChatApi";
 
 interface ClientProfileHeaderProps {
   name: string;
@@ -25,16 +24,14 @@ export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
 }) => {
   const router = useRouter();
 
-  const [createRoom, { isLoading: openingChat }] =
-    useCreateAdminProviderRoomByBookingMutation();
+  const [createRoomTrigger] = useCreateAdminProviderRoomByBookingMutation();
 
   const handleOpenChat = async (bookingId: number) => {
     try {
-      const res = await createRoom(bookingId).unwrap();
-      const syntheticRoomId = encodeAdminProviderRoomId(res.data.id);
-      router.push(`/messages?roomId=${syntheticRoomId}`);
+      const res = await createRoomTrigger(bookingId).unwrap();
+      router.push(`/messages?roomId=${res.data.id}`);
     } catch (error) {
-      console.error("Failed to open chat room", error);
+      console.error("Failed to open admin/user chat room", error);
     }
   };
 
@@ -63,8 +60,9 @@ export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
           disabled={!todayBookingId && !previousBookingId}
         >
           <MessageCircle className="w-4 h-4" />
-          {openingChat ? "Opening..." : "Chat"}
+          Chat
         </Button>
+
         <Button onClick={handleDeleteAccount} variant="outline">
           <Ban className="w-4 h-4" />
           Disable Account

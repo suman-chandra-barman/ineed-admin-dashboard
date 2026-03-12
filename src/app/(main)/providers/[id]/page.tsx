@@ -106,7 +106,7 @@ export default function ProviderDetailsPage({
             totalJobs={provider.complete_job + provider.pending_job}
             completedJobs={provider.complete_job}
             pendingJobs={provider.pending_job}
-            availableDays={provider.availability_day}
+            availableDays={Array.isArray(provider.availability_day) ? provider.availability_day : [provider.availability_day]}
             availableTimes={provider.availability_time}
           />
         </div>

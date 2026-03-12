@@ -2,11 +2,13 @@
 
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface Conversation {
   id: string;
   name: string;
   avatar: string;
+  avatarUrl: string | null;
   lastMessage: string;
   timestamp: string;
   unreadCount?: number;
@@ -30,6 +32,7 @@ export default function ChatHeader({
     return "bg-gray-400";
   };
 
+  console.log("Selected Conversation:", selectedConv);
   return (
     <div className="p-4 border-b">
       <div className="flex items-center gap-3">
@@ -47,17 +50,27 @@ export default function ChatHeader({
             selectedConv.id,
           )}`}
         >
-          {selectedConv.avatar}
+          {selectedConv.avatarUrl ? (
+            <Image
+              src={`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${selectedConv.avatarUrl}`}
+              alt={selectedConv.name}
+              className="w-full h-full object-cover rounded-full"
+              width={40}
+              height={40}
+            />
+          ) : (
+            selectedConv.avatar
+          )}
         </div>
         <div>
           <h3 className="font-semibold">{selectedConv.name}</h3>
           <p className="text-xs text-gray-500">
             {selectedConv.isOnline
               ? "Active now"
-              : selectedConv.lastSeen || "Last seen 7h ago"}
+              : selectedConv.lastSeen ? `Last seen ${selectedConv.lastSeen}` : "Conversation"}
           </p>
         </div>
+        </div>
       </div>
-    </div>
   );
 }

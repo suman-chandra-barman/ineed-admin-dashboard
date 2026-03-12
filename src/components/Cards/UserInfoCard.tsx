@@ -21,7 +21,7 @@ const UserInfoCard: React.FC<InfoCardProps> = ({
         </div>
         <span className="text-sm font-medium text-gray-600">{label}</span>
       </div>
-      <p className="text-base font-semibold text-gray-900">{value}</p>
+      <p className="font-semibold text-gray-900 wrap-break-word">{value}</p>
     </div>
   );
 };

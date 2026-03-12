@@ -1,17 +1,20 @@
 "use client";
 
-import { Search, ChevronDown } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 interface Conversation {
   id: string;
   name: string;
   avatar: string;
+  avatarUrl?: string | null;
   lastMessage: string;
   timestamp: string;
   unreadCount?: number;
   isOnline?: boolean;
   lastSeen?: string;
+  chatType?: "admin_provider" | "user_admin";
 }
 
 interface ChatSidebarProps {
@@ -38,13 +41,32 @@ export default function ChatSidebar({
     return "bg-gray-400";
   };
 
+  const getBadge = (chatType?: Conversation["chatType"]) => {
+    if (chatType === "admin_provider") {
+      return (
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 shrink-0">
+          Provider
+        </span>
+      );
+    }
+
+    if (chatType === "user_admin") {
+      return (
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 shrink-0">
+          User
+        </span>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div
       className={`${
         showMobileSidebar ? "w-full" : "hidden"
       } lg:w-80 lg:block border-r flex flex-col`}
     >
-      {/* Sidebar Header */}
       <div className="p-4">
         <div className="mb-4">
           <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -52,7 +74,6 @@ export default function ChatSidebar({
           </h2>
         </div>
 
-        {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
@@ -65,14 +86,12 @@ export default function ChatSidebar({
         </div>
       </div>
 
-      {/* Conversations List */}
       <div className="flex-1 overflow-y-auto">
         {conversations
           .filter((conv) =>
             conv.name.toLowerCase().includes(searchQuery.toLowerCase()),
           )
           .map((conv) => {
-            console.log("conversation", conv)
             return (
               <div
                 key={conv.id}
@@ -81,33 +100,45 @@ export default function ChatSidebar({
                   selectedConversation === conv.id ? "bg-blue-50" : ""
                 }`}
               >
-                {/* Avatar */}
-                <div className="relative">
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold ${getAvatarColor(
-                      conv.id,
-                    )}`}
-                  >
-                    {conv.avatar}
-                  </div>
+                <div className="relative shrink-0">
+                  {conv.avatarUrl ? (
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${conv.avatarUrl}`}
+                      alt={conv.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                      width={40}
+                      height={40}
+                    />
+                  ) : (
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${getAvatarColor(
+                        conv.id,
+                      )}`}
+                    >
+                      {conv.avatar}
+                    </div>
+                  )}
                   {conv.isOnline && (
                     <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                   )}
                 </div>
 
-                {/* Message Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold text-sm truncate">
-                      {conv.name}
-                    </h3>
+                  <div className="flex items-center justify-between mb-1 gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h3 className="font-semibold text-sm truncate">
+                        {conv.name}
+                      </h3>
+                      {getBadge(conv.chatType)}
+                    </div>
                     <span className="text-xs text-gray-500 shrink-0">
                       {conv.timestamp}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
+
+                  <div className="flex items-center justify-between gap-2">
                     <p className="text-sm text-gray-600 truncate">
-                      {conv.lastMessage}
+                      {conv.lastMessage || "No messages yet"}
                     </p>
                     {conv.unreadCount && conv.unreadCount > 0 ? (
                       <span className="bg-yellow-400 text-yellow-900 text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center shrink-0 ml-2">

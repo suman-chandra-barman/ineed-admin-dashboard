@@ -1,15 +1,15 @@
 import { baseApi } from "@/redux/api/baseApi";
 import type {
-  AdminProviderChatRoomResponse,
-  AdminProviderChatRoomsResponse,
-  AdminProviderChatMessagesResponse,
-  AdminProviderMarkReadResponse,
+  AdminChatRoomResponse,
+  AdminChatRoomsResponse,
+  AdminChatMessagesResponse,
+  AdminMarkReadResponse,
 } from "@/app/types/admin-chat.type";
 
 export const adminProviderChatApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createAdminProviderRoomByBooking: builder.mutation<
-      AdminProviderChatRoomResponse,
+      AdminChatRoomResponse,
       number
     >({
       query: (bookingId) => ({
@@ -19,20 +19,23 @@ export const adminProviderChatApi = baseApi.injectEndpoints({
       invalidatesTags: ["Booking"],
     }),
 
-    // room list old dedicated endpoint-এই থাকবে
-    getAdminProviderRooms: builder.query<AdminProviderChatRoomsResponse, void>({
-      query: () => ({
-        url: "/bookings/chat/admin-provider/rooms/",
+    createAdminUserRoomByBooking: builder.query<AdminChatRoomResponse, number>({
+      query: (bookingId) => ({
+        url: `/bookings/chat/booking/${bookingId}/room/?chat_with=user`,
         method: "GET",
       }),
       providesTags: ["Booking"],
     }),
 
-    // messages generic unified endpoint use করবে
-    getAdminProviderMessages: builder.query<
-      AdminProviderChatMessagesResponse,
-      number
-    >({
+    getAdminProviderRooms: builder.query<AdminChatRoomsResponse, void>({
+      query: () => ({
+        url: "/bookings/chat/rooms/",
+        method: "GET",
+      }),
+      providesTags: ["Booking"],
+    }),
+
+    getAdminProviderMessages: builder.query<AdminChatMessagesResponse, number>({
       query: (roomId) => ({
         url: `/bookings/chat/rooms/${roomId}/messages/`,
         method: "GET",
@@ -40,11 +43,7 @@ export const adminProviderChatApi = baseApi.injectEndpoints({
       providesTags: ["Booking"],
     }),
 
-    // read generic unified endpoint use করবে
-    markAdminProviderRead: builder.mutation<
-      AdminProviderMarkReadResponse,
-      number
-    >({
+    markAdminProviderRead: builder.mutation<AdminMarkReadResponse, number>({
       query: (roomId) => ({
         url: `/bookings/chat/rooms/${roomId}/read/`,
         method: "POST",
@@ -56,6 +55,9 @@ export const adminProviderChatApi = baseApi.injectEndpoints({
 
 export const {
   useCreateAdminProviderRoomByBookingMutation,
+  useLazyGetAdminProviderRoomsQuery,
+  useCreateAdminUserRoomByBookingQuery,
+  useLazyCreateAdminUserRoomByBookingQuery,
   useGetAdminProviderRoomsQuery,
   useLazyGetAdminProviderMessagesQuery,
   useMarkAdminProviderReadMutation,

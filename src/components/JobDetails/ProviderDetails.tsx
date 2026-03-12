@@ -25,6 +25,7 @@ export default function ProviderDetails({
     return `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${imagePath}`;
   };
 
+  console.log("provider --->", provider)
   return (
     <div className="border rounded-lg p-4">
       <h2 className="text-lg font-semibold mb-6">Provider Details :</h2>
@@ -77,7 +78,7 @@ export default function ProviderDetails({
       </div>
 
       {/* Chat Button */}
-      <Button onClick={onChatClick} className="w-full" disabled={!provider}>
+      <Button onClick={onChatClick} className="w-full" disabled={!provider || !provider.email}>
         <MessageCircle className="w-5 h-5" />
         Chat
       </Button>

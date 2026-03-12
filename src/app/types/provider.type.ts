@@ -5,7 +5,7 @@ export interface Provider {
   email_address: string;
   service_type: string;
   location: string;
-  availability_day: string;
+  availability_day: string[];
   availability_time: string;
   status: string;
 }
