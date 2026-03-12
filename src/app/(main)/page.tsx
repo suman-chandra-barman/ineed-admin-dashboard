@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { StatusCards } from "@/components/Cards/StatusCards";
 import { RecentUsersTable } from "@/components/Tables/RecentUsersTable";
 import { useGetOverviewQuery } from "@/redux/features/overview/overviewApi";
@@ -12,10 +12,10 @@ const OverviewPage = () => {
 
   const { data, isLoading, isError } = useGetOverviewQuery({ search, page });
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     setSearch(query);
     setPage(1);
-  };
+  }, []);
 
   if (isLoading) {
     return (

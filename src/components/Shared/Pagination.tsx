@@ -65,7 +65,7 @@ export function Pagination({
 
       {/* Page Numbers */}
       {getPageNumbers().map((page, index) => (
-        <div key={index}>
+        <div key={typeof page === "number" ? `page-${page}` : `dots-${index}`}>
           {page === "..." ? (
             <span className="px-2 text-gray-400">...</span>
           ) : (
