@@ -31,7 +31,7 @@ function getInitials(name?: string | null) {
 
 export function mapAdminProviderRoomToConversation(room: AdminChatRoomItem) {
   console.log("Mapping room:", room);
-  
+
   const isProviderChat = room.chat_type === "admin_provider";
   // Backend already returns unique IDs with offset applied, no need to encode again
   const roomId = room.id;
