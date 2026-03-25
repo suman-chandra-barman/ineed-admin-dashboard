@@ -18,14 +18,6 @@ export default function ProviderDetails({
   provider,
   onChatClick,
 }: ProviderDetailsProps) {
-  const getImageUrl = (imagePath: string) => {
-    if (imagePath.startsWith("http")) {
-      return imagePath;
-    }
-    return `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${imagePath}`;
-  };
-
-  console.log("provider --->", provider)
   return (
     <div className="border rounded-lg p-4">
       <h2 className="text-lg font-semibold mb-6">Provider Details :</h2>
@@ -33,16 +25,18 @@ export default function ProviderDetails({
       {/* Provider Avatar */}
       <div className="flex justify-center mb-6">
         <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-200">
-          <Image
-            src={
-              provider?.avatar
-                ? getImageUrl(provider.avatar)
-                : "/default-avatar.jpg"
-            }
-            alt={"Provider Avatar"}
-            fill
-            className="object-cover"
-          />
+          {provider?.avatar ? (
+            <Image
+              src={`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${provider.avatar}`}
+              alt={provider.name}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="bg-gray-200 rounded-full w-full h-full flex items-center justify-center uppercase">
+              {provider?.name.charAt(0)}{" "}
+            </div>
+          )}
         </div>
       </div>
 
@@ -78,7 +72,11 @@ export default function ProviderDetails({
       </div>
 
       {/* Chat Button */}
-      <Button onClick={onChatClick} className="w-full" disabled={!provider || !provider.email}>
+      <Button
+        onClick={onChatClick}
+        className="w-full"
+        disabled={!provider || !provider.email}
+      >
         <MessageCircle className="w-5 h-5" />
         Chat
       </Button>

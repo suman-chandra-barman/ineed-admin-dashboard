@@ -57,7 +57,7 @@ export default function ProviderDetailsPage({
 
   const { data, isLoading, isError } = useGetProviderDetailsQuery(id);
 
-  const handleViewJobDetails = (jobId:number) => {
+  const handleViewJobDetails = (jobId: number) => {
     router.push(`job/${jobId}`);
   };
 
@@ -74,12 +74,6 @@ export default function ProviderDetailsPage({
   }
 
   const { provider, today_jobs, job_history } = data.data;
-  const backendBase = process.env.NEXT_PUBLIC_BACKEND_BASE_URL ?? "";
-  const imageUrl = provider.image
-    ? provider.image.startsWith("http")
-      ? provider.image
-      : `${backendBase}${provider.image}`
-    : "/placeholder-avatar.jpg";
 
   const todayJobsMapped = today_jobs.map(mapJob);
   const historyJobsMapped = job_history.results.map(mapJob);
@@ -93,9 +87,15 @@ export default function ProviderDetailsPage({
           <ClientProfileHeader
             name={provider.full_name}
             userId={provider.normal_id}
-            imageUrl={imageUrl}
-            todayBookingId={today_jobs.length > 0 ? today_jobs[0].id : undefined}
-            previousBookingId={job_history.results.length > 0 ? job_history.results[0].id : undefined}
+            image={provider.image}
+            todayBookingId={
+              today_jobs.length > 0 ? today_jobs[0].id : undefined
+            }
+            previousBookingId={
+              job_history.results.length > 0
+                ? job_history.results[0].id
+                : undefined
+            }
           />
 
           {/* Provider Info Cards */}
@@ -106,7 +106,11 @@ export default function ProviderDetailsPage({
             totalJobs={provider.complete_job + provider.pending_job}
             completedJobs={provider.complete_job}
             pendingJobs={provider.pending_job}
-            availableDays={Array.isArray(provider.availability_day) ? provider.availability_day : [provider.availability_day]}
+            availableDays={
+              Array.isArray(provider.availability_day)
+                ? provider.availability_day
+                : [provider.availability_day]
+            }
             availableTimes={provider.availability_time}
           />
         </div>
