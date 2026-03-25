@@ -32,7 +32,6 @@ export default function ChatHeader({
     return "bg-gray-400";
   };
 
-  console.log("Selected Conversation:", selectedConv);
   return (
     <div className="p-4 border-b">
       <div className="flex items-center gap-3">

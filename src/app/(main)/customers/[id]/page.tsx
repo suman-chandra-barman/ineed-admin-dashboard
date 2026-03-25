@@ -39,8 +39,6 @@ export default function CustomerDetailsPage({
 
   const { user, job_history } = data.data;
 
-  console.log("Customer details data:", data.data);
-
   return (
     <div className="min-h-screen bg-white p-4 md:p-6 rounded-2xl">
       <div className="space-y-6">

@@ -1,6 +1,3 @@
-import React from "react";
-import { FiMap } from "react-icons/fi";
-
 interface JobScheduleLocationProps {
   customer: {
     name: string;
@@ -20,11 +17,6 @@ export default function JobScheduleLocation({
   customer,
   schedule,
 }: JobScheduleLocationProps) {
-  const handleMapClick = () => {
-    // Handle map navigation
-    console.log("Open map");
-  };
-
   return (
     <div className="border rounded-lg p-4">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
