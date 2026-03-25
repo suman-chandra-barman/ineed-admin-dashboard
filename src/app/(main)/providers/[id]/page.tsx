@@ -88,6 +88,7 @@ export default function ProviderDetailsPage({
             name={provider.full_name}
             userId={provider.normal_id}
             image={provider.image}
+            userRole={provider.role}
             todayBookingId={
               today_jobs.length > 0 ? today_jobs[0].id : undefined
             }

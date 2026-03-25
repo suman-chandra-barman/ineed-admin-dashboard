@@ -5,12 +5,19 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { Ban, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCreateAdminProviderRoomByBookingMutation } from "@/redux/features/chat/adminProviderChatApi";
+import {
+  useCreateAdminProviderRoomByBookingMutation,
+  useCreateAdminUserRoomByBookingQuery,
+} from "@/redux/features/chat/adminProviderChatApi";
+import { useUpdateUserStatusMutation } from "@/redux/features/overview/overviewApi";
+import { useUpdateProviderStatusMutation } from "@/redux/features/providers/providerApi";
+import { toast } from "sonner";
 
 interface ClientProfileHeaderProps {
   name: string;
   userId: string;
   image: string | null;
+  userRole: string;
   todayBookingId?: number | undefined;
   previousBookingId?: number | undefined;
   provider?: boolean;
@@ -22,24 +29,63 @@ export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
   image,
   todayBookingId,
   previousBookingId,
-  provider= true,
+  provider = true,
+  userRole,
 }) => {
   const router = useRouter();
+  const bookingId = todayBookingId ?? previousBookingId;
 
   const [createRoomTrigger] = useCreateAdminProviderRoomByBookingMutation();
+  const [updateUserStatus, { isLoading: isDisablingUser }] =
+    useUpdateUserStatusMutation();
+  const [updateProviderStatus, { isLoading: isDisablingProvider }] =
+    useUpdateProviderStatusMutation();
+  const { data: userRoomData } = useCreateAdminUserRoomByBookingQuery(
+    bookingId ?? 0,
+    {
+      skip: userRole !== "user" || bookingId === undefined,
+    },
+  );
 
-  const handleOpenChat = async (bookingId: number) => {
-    console.log("Opening chat for booking ID:", bookingId);
+  const handleOpenChat = async (targetBookingId: number) => {
     try {
-      const res = await createRoomTrigger(bookingId).unwrap();
-      router.push(`/messages?roomId=${res.data.id}`);
+      if (userRole === "user") {
+        if (userRoomData?.data.id) {
+          router.push(`/messages?roomId=${userRoomData.data.id}`);
+        }
+      } else if (userRole === "provider") {
+        const res = await createRoomTrigger(targetBookingId).unwrap();
+        router.push(`/messages?roomId=${res.data.id}`);
+      }
     } catch (error) {
       console.error("Failed to open admin/user chat room", error);
     }
   };
 
-  const handleDeleteAccount = () => {
-    console.log("Disable account");
+  const sanitizedId = userId.replace(/^#/, "");
+  const isDisabling = isDisablingUser || isDisablingProvider;
+
+  const handleDisableAccount = async () => {
+    try {
+      if (userRole === "user") {
+        await updateUserStatus({
+          normalId: sanitizedId,
+          is_active: false,
+        }).unwrap();
+        toast.success("User account disabled");
+      } else if (userRole === "provider") {
+        await updateProviderStatus({
+          normalId: sanitizedId,
+          is_active: false,
+        }).unwrap();
+        toast.success("Provider account disabled");
+      } else {
+        toast.error("Unsupported role for disable action");
+      }
+    } catch (error) {
+      console.error("Failed to disable account", error);
+      toast.error("Failed to disable account");
+    }
   };
 
   return (
@@ -68,7 +114,6 @@ export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
       <div className="flex items-center gap-4">
         <Button
           onClick={() => {
-            const bookingId = todayBookingId ?? previousBookingId;
             if (bookingId !== undefined) handleOpenChat(bookingId);
           }}
           disabled={(!todayBookingId && !previousBookingId) || !provider}
@@ -77,9 +122,13 @@ export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
           Chat
         </Button>
 
-        <Button onClick={handleDeleteAccount} variant="outline">
+        <Button
+          onClick={handleDisableAccount}
+          variant="outline"
+          disabled={isDisabling}
+        >
           <Ban className="w-4 h-4" />
-          Disable Account
+          {isDisabling ? "Disabling..." : "Disable Account"}
         </Button>
       </div>
     </div>

@@ -27,7 +27,26 @@ export const overviewApi = baseApi.injectEndpoints({
       }),
       providesTags: (_result, _error, id) => [{ type: "Overview", id }],
     }),
+
+    updateUserStatus: builder.mutation<
+      { success: boolean; message: string },
+      { normalId: string; is_active?: boolean }
+    >({
+      query: ({ normalId, is_active = false }) => ({
+        url: `/bookings/admin/users/${normalId}/status/`,
+        method: "POST",
+        body: { is_active },
+      }),
+      invalidatesTags: (_result, _error, { normalId }) => [
+        { type: "Overview", id: normalId },
+        "Overview",
+      ],
+    }),
   }),
 });
 
-export const { useGetOverviewQuery, useGetUserDetailsQuery } = overviewApi;
+export const {
+  useGetOverviewQuery,
+  useGetUserDetailsQuery,
+  useUpdateUserStatusMutation,
+} = overviewApi;

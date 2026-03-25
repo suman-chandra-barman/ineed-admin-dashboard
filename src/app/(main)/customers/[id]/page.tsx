@@ -39,6 +39,8 @@ export default function CustomerDetailsPage({
 
   const { user, job_history } = data.data;
 
+  console.log("Customer details data:", data.data);
+
   return (
     <div className="min-h-screen bg-white p-4 md:p-6 rounded-2xl">
       <div className="space-y-6">
@@ -49,12 +51,15 @@ export default function CustomerDetailsPage({
             name={user.full_name}
             userId={user.normal_id}
             image={user.image}
+            userRole={user.role}
             previousBookingId={
               job_history.results.length > 0
                 ? job_history.results[0].id
                 : undefined
             }
-            provider={!!job_history.results[0].provider_name}
+            provider={job_history.results.some((job) =>
+              Boolean(job.provider_name),
+            )}
           />
 
           {/* Client Info Cards */}

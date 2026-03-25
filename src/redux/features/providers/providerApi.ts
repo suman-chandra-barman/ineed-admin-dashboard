@@ -29,7 +29,23 @@ export const providerApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Providers"],
     }),
+
+    updateProviderStatus: builder.mutation<
+      { success: boolean; message: string },
+      { normalId: string; is_active?: boolean }
+    >({
+      query: ({ normalId, is_active = false }) => ({
+        url: `/bookings/admin/providers/${normalId}/status/`,
+        method: "POST",
+        body: { is_active },
+      }),
+      invalidatesTags: ["Providers"],
+    }),
   }),
 });
 
-export const { useGetProvidersQuery, useGetProviderDetailsQuery } = providerApi;
+export const {
+  useGetProvidersQuery,
+  useGetProviderDetailsQuery,
+  useUpdateProviderStatusMutation,
+} = providerApi;
