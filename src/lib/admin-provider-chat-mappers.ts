@@ -3,11 +3,6 @@ import type {
   AdminChatRoomItem,
 } from "@/app/types/admin-chat.type";
 
-export const ADMIN_PROVIDER_ROOM_ID_OFFSET = 1000000000;
-
-export function encodeAdminProviderRoomId(roomId: number) {
-  return ADMIN_PROVIDER_ROOM_ID_OFFSET + Number(roomId);
-}
 
 function formatTime(value?: string | null) {
   if (!value) return "";
