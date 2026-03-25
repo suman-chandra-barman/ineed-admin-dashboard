@@ -54,6 +54,7 @@ export default function CustomerDetailsPage({
                 ? job_history.results[0].id
                 : undefined
             }
+            provider={!!job_history.results[0].provider_name}
           />
 
           {/* Client Info Cards */}

@@ -34,7 +34,7 @@ export default function ProviderDetails({
             />
           ) : (
             <div className="bg-gray-200 rounded-full w-full h-full flex items-center justify-center uppercase">
-              {provider?.name.charAt(0)}{" "}
+              {`${provider?.name?.charAt(0) || ""}`}{" "}
             </div>
           )}
         </div>

@@ -13,6 +13,7 @@ interface ClientProfileHeaderProps {
   image: string | null;
   todayBookingId?: number | undefined;
   previousBookingId?: number | undefined;
+  provider?: boolean;
 }
 
 export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
@@ -21,12 +22,14 @@ export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
   image,
   todayBookingId,
   previousBookingId,
+  provider= true,
 }) => {
   const router = useRouter();
 
   const [createRoomTrigger] = useCreateAdminProviderRoomByBookingMutation();
 
   const handleOpenChat = async (bookingId: number) => {
+    console.log("Opening chat for booking ID:", bookingId);
     try {
       const res = await createRoomTrigger(bookingId).unwrap();
       router.push(`/messages?roomId=${res.data.id}`);
@@ -68,7 +71,7 @@ export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
             const bookingId = todayBookingId ?? previousBookingId;
             if (bookingId !== undefined) handleOpenChat(bookingId);
           }}
-          disabled={!todayBookingId && !previousBookingId}
+          disabled={(!todayBookingId && !previousBookingId) || !provider}
         >
           <MessageCircle className="w-4 h-4" />
           Chat
