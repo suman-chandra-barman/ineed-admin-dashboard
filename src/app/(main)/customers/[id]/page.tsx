@@ -21,15 +21,12 @@ export default function CustomerDetailsPage({
 
   const { data, isLoading, isError } = useGetUserDetailsQuery(id);
 
-
-  const handleViewJobDetails = (jobId:number) => {
+  const handleViewJobDetails = (jobId: number) => {
     router.push(`job/${jobId}`);
   };
 
   if (isLoading) {
-    return (
-        <LoadingSpinner text="Loading customer details..." />
-    );
+    return <LoadingSpinner text="Loading customer details..." />;
   }
 
   if (isError || !data) {
@@ -41,12 +38,6 @@ export default function CustomerDetailsPage({
   }
 
   const { user, job_history } = data.data;
-  const backendBase = process.env.NEXT_PUBLIC_BACKEND_BASE_URL ?? "";
-  const imageUrl = user.image
-    ? user.image.startsWith("http")
-      ? user.image
-      : `${backendBase}${user.image}`
-    : "/placeholder-avatar.jpg";
 
   return (
     <div className="min-h-screen bg-white p-4 md:p-6 rounded-2xl">
@@ -57,7 +48,12 @@ export default function CustomerDetailsPage({
           <ClientProfileHeader
             name={user.full_name}
             userId={user.normal_id}
-            imageUrl={imageUrl}
+            image={user.image}
+            previousBookingId={
+              job_history.results.length > 0
+                ? job_history.results[0].id
+                : undefined
+            }
           />
 
           {/* Client Info Cards */}

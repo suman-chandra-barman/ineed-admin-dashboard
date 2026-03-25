@@ -10,7 +10,7 @@ import { useCreateAdminProviderRoomByBookingMutation } from "@/redux/features/ch
 interface ClientProfileHeaderProps {
   name: string;
   userId: string;
-  imageUrl: string;
+  image: string | null;
   todayBookingId?: number | undefined;
   previousBookingId?: number | undefined;
 }
@@ -18,7 +18,7 @@ interface ClientProfileHeaderProps {
 export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
   name,
   userId,
-  imageUrl,
+  image,
   todayBookingId,
   previousBookingId,
 }) => {
@@ -42,8 +42,19 @@ export const ClientProfileHeader: React.FC<ClientProfileHeaderProps> = ({
   return (
     <div className="flex items-start justify-between">
       <div className="flex items-center gap-4">
-        <div className="relative w-16 h-16 rounded-full overflow-hidden ring-2 ring-purple-100">
-          <Image src={imageUrl} alt={name} fill className="object-cover" />
+        <div className="relative w-16 h-16 rounded-full overflow-hidden">
+          {image ? (
+            <Image
+              src={`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${image}`}
+              alt={name}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="bg-gray-200 rounded-full w-full h-full flex items-center justify-center uppercase">
+              {name.charAt(0)}{" "}
+            </div>
+          )}
         </div>
         <div>
           <h2 className="text-xl font-bold text-gray-900">{name}</h2>
