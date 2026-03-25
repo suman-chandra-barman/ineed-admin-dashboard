@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 interface Message {
   id: string;
   senderId: string;
@@ -13,6 +15,12 @@ interface ChatMessagesProps {
 }
 
 export default function ChatMessages({ messages }: ChatMessagesProps) {
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   if (messages.length === 0) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -68,6 +76,8 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
           </div>
         </div>
       ))}
+
+      <div ref={bottomRef} />
     </div>
   );
 }
