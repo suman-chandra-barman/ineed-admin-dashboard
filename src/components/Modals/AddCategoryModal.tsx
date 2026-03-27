@@ -176,7 +176,7 @@ export default function AddCategoryModal({
         {/* Action Buttons */}
         <div className="flex gap-3 pt-2">
           <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
-            Cancel asdfas
+            Cancel
           </Button>
           <Button
             onClick={handleSave}
